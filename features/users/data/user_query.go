@@ -2,29 +2,30 @@ package data
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"project/features/users"
 
-	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
 	"github.com/sirupsen/logrus"
 )
 
 type UserData struct {
-	db  *db.Client
-	app *firebase.App
+	db *db.Client
 }
 
-func NewUserData(client *db.Client, app *firebase.App) users.UserDataInterface {
+func NewUserData(client *db.Client) users.UserDataInterface {
 	return &UserData{
-		db:  client,
-		app: app,
+		db: client,
 	}
 }
 
 func (ud *UserData) Insert(newData users.User) error {
-	fmt.Println(newData)
-	ref := ud.db.NewRef("user").Child(newData.Username)
+	userError := errors.New("user exists")
+	exist := ud.GetUserByUsername(newData.Username)
+	if exist {
+		return userError
+	}
+	ref := ud.db.NewRef("users").Child(newData.Username)
 	if err := ref.Set(context.Background(), newData); err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func (ud *UserData) Insert(newData users.User) error {
 }
 
 func (ud *UserData) Login(username string, password string) (*users.User, error) {
-	ref := ud.db.NewRef("user/").Child(username)
+	ref := ud.db.NewRef("users").Child(username)
 	var user users.User
 	if err := ref.Get(context.Background(), &user); err != nil {
 		return nil, err
@@ -45,4 +46,13 @@ func (ud *UserData) Login(username string, password string) (*users.User, error)
 	}
 
 	return &user, nil
+}
+
+func (ud *UserData) GetUserByUsername(username string) bool {
+	ref := ud.db.NewRef("users").Child(username)
+	var user users.User
+	if err := ref.Get(context.Background(), &user); err != nil {
+		return false
+	}
+	return true
 }

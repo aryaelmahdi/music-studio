@@ -21,7 +21,7 @@ func main() {
 	if db == nil {
 		e.Logger.Fatal("db nil")
 	}
-	userData := data.NewUserData(client, db)
+	userData := data.NewUserData(client)
 
 	generator := helper.NewGenerator()
 	jwt := helper.NewJWT(config.SECRET)

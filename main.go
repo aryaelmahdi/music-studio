@@ -2,9 +2,12 @@ package main
 
 import (
 	"project/config"
-	"project/features/users/data"
-	"project/features/users/handler"
-	"project/features/users/service"
+	rd "project/features/rooms/data"
+	rh "project/features/rooms/handler"
+	rs "project/features/rooms/service"
+	ud "project/features/users/data"
+	uh "project/features/users/handler"
+	us "project/features/users/service"
 	"project/helper"
 	"project/routes"
 	"project/utils/database"
@@ -21,13 +24,18 @@ func main() {
 	if db == nil {
 		e.Logger.Fatal("db nil")
 	}
-	userData := data.NewUserData(client)
 
 	generator := helper.NewGenerator()
 	jwt := helper.NewJWT(config.SECRET)
-	userServices := service.NewUserService(userData, generator, jwt)
 
-	userHandler := handler.NewUserHandler(userServices)
+	userData := ud.NewUserData(client)
+	userServices := us.NewUserService(userData, generator, jwt)
+	userHandler := uh.NewUserHandler(userServices)
+
+	roomData := rd.NewRoomData(client)
+	roomServices := rs.NewRoomService(roomData)
+	roomHandler := rh.NewRoomHandler(roomServices)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -35,6 +43,9 @@ func main() {
 		middleware.LoggerConfig{
 			Format: "method=${method}, uri=${uri}, status=${status}, time=${time_rfc3339}\n",
 		}))
-	routes.RouteUser(e, userHandler)
+
+	routes.UserRoutes(e, userHandler)
+	routes.RoomRoutes(e, roomHandler, config.SECRET)
+
 	e.Logger.Fatal(e.Start(":8080").Error())
 }

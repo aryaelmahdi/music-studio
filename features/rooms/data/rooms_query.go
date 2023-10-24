@@ -2,9 +2,10 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"project/features/rooms"
 
-	"firebase.google.com/go/v4/db"
+	"firebase.google.com/go/db"
 )
 
 type RoomData struct {
@@ -33,4 +34,46 @@ func (rd *RoomData) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 		return nil, err
 	}
 	return &room, nil
+}
+
+func (rd *RoomData) AddRoom(newRoom rooms.Rooms) (*rooms.Rooms, error) {
+	ref := rd.db.NewRef("rooms").Child(newRoom.RoomID)
+	if err := ref.Set(context.Background(), newRoom); err != nil {
+		return nil, err
+	}
+	return &newRoom, nil
+}
+
+func (rd *RoomData) DeleteRoom(roomID string) error {
+	ref := rd.db.NewRef("rooms").Child(roomID)
+	if err := ref.Delete(context.Background()); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.Rooms, error) {
+	ref := rd.db.NewRef("rooms").Child(roomID)
+	res, err := rd.toMap(updatedRoom)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := ref.Update(context.Background(), res); err != nil {
+		return nil, err
+	}
+	return &updatedRoom, nil
+}
+
+func (rd *RoomData) toMap(roomData rooms.Rooms) (map[string]interface{}, error) {
+	roomJSON, err := json.Marshal(roomData)
+	if err != nil {
+		return nil, err
+	}
+
+	var roomMap map[string]interface{}
+	if err := json.Unmarshal(roomJSON, &roomMap); err != nil {
+		return nil, err
+	}
+	return roomMap, nil
 }

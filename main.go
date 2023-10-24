@@ -2,6 +2,9 @@ package main
 
 import (
 	"project/config"
+	id "project/features/instruments/data"
+	ih "project/features/instruments/handler"
+	is "project/features/instruments/service"
 	rd "project/features/rooms/data"
 	rh "project/features/rooms/handler"
 	rs "project/features/rooms/service"
@@ -36,6 +39,10 @@ func main() {
 	roomServices := rs.NewRoomService(roomData)
 	roomHandler := rh.NewRoomHandler(roomServices)
 
+	instrumentData := id.NewInstrumentData(client)
+	instrumentService := is.NewInstrumentService(instrumentData, jwt)
+	instrumentHandler := ih.NewInstrumentHandler(instrumentService)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -46,6 +53,7 @@ func main() {
 
 	routes.UserRoutes(e, userHandler)
 	routes.RoomRoutes(e, roomHandler, config.SECRET)
+	routes.InstrumentsRoutes(e, instrumentHandler, config.SECRET)
 
 	e.Logger.Fatal(e.Start(":8080").Error())
 }

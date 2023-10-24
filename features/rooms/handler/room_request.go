@@ -1,8 +1,10 @@
 package handler
 
-import "project/features/rooms"
+import (
+	"project/features/instruments"
+)
 
 type UpdateRoomInput struct {
-	Instruments rooms.Instruments `json:"instrument"`
-	Price       int               `json:"price"`
+	Instruments instruments.InstrumentsMap `json:"instrument"`
+	Price       int                        `json:"price"`
 }

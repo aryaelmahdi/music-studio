@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -43,6 +44,19 @@ func loadConfig() *Config {
 	}
 	if val, found := os.LookupEnv("DatabaseURL"); found {
 		res.DatabaseURL = val
+	}
+	if val, found := os.LookupEnv("GOOCREDS"); found {
+
+		file, err := os.Create("credentials.json")
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+
+		_, err = io.WriteString(file, val)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return res
 }

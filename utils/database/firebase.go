@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
@@ -11,19 +12,16 @@ import (
 )
 
 func InitFirebaseApp(sdk string, projectID string, url string) (*firebase.App, *db.Client) {
-	// opt := option.WithCredentialsFile(sdk)
-	// app, err := firebase.NewApp(context.Background(), nil, opt)
-	// if err != nil {
-	// 	log.Fatalf("Error initializing Firebase App: %v", err)
-	// 	return nil
-	// }
-
-	// return app
-	////////////////////////////////////////////////////////////////////////
 	conf := &firebase.Config{
 		DatabaseURL: url,
 	}
-	opt := option.WithCredentialsFile(sdk)
+
+	file, err := os.Open("credentials.json")
+	if err != nil {
+		log.Fatalln("Error reading credentials file:", err)
+	}
+
+	opt := option.WithCredentialsFile(file.Name())
 
 	app, err := firebase.NewApp(context.Background(), conf, opt)
 	if err != nil {

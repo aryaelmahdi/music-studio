@@ -10,9 +10,9 @@ import (
 )
 
 type JWTInterface interface {
-	GenerateJWT(userID string) map[string]any
-	GenerateToken(id string) string
-	ExtractToken(token *jwt.Token) any
+	GenerateJWT(userID string, role string) map[string]any
+	GenerateToken(id string, role string) string
+	ExtractToken(token *jwt.Token) (any, any)
 }
 
 type JWT struct {
@@ -26,9 +26,9 @@ func NewJWT(signKey string) JWTInterface {
 	}
 }
 
-func (j *JWT) GenerateJWT(userID string) map[string]any {
+func (j *JWT) GenerateJWT(userID string, role string) map[string]any {
 	var result = map[string]any{}
-	var accessToken = j.GenerateToken(userID)
+	var accessToken = j.GenerateToken(userID, role)
 	if accessToken == "" {
 		return nil
 	}
@@ -36,9 +36,10 @@ func (j *JWT) GenerateJWT(userID string) map[string]any {
 	return result
 }
 
-func (j *JWT) GenerateToken(id string) string {
+func (j *JWT) GenerateToken(id string, role string) string {
 	var claims = jwt.MapClaims{}
 	claims["id"] = id
+	claims["role"] = role
 	claims["iat"] = time.Now().Unix()
 	claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
 
@@ -103,7 +104,7 @@ func (j *JWT) generateRefreshToken(accessToken string) string {
 	return refreshToken
 }
 
-func (j JWT) ExtractToken(token *jwt.Token) any {
+func (j JWT) ExtractToken(token *jwt.Token) (any, any) {
 	if token.Valid {
 		var claims = token.Claims
 		expTime, _ := claims.GetExpirationTime()
@@ -111,12 +112,13 @@ func (j JWT) ExtractToken(token *jwt.Token) any {
 		if expTime.Time.Compare(time.Now()) > 0 {
 			var mapClaim = claims.(jwt.MapClaims)
 			var id = mapClaim["id"]
-			return id
+			var role = mapClaim["role"]
+			return id, role
 		}
 
 		logrus.Error("Token expired")
-		return nil
+		return nil, nil
 
 	}
-	return nil
+	return nil, nil
 }

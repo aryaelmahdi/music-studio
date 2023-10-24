@@ -44,7 +44,7 @@ func (us *UserService) Login(username string, password string) (*users.UserCrede
 	}
 	fmt.Println("service :", result)
 
-	tokenData := us.j.GenerateJWT(result.Username)
+	tokenData := us.j.GenerateJWT(result.Username, result.Role)
 
 	if tokenData == nil {
 		return nil, errors.New("token process failed")

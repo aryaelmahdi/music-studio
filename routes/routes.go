@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"project/features/instruments"
 	"project/features/rooms"
 	"project/features/users"
 
@@ -19,4 +20,12 @@ func RoomRoutes(e *echo.Echo, rh rooms.RoomHandler, secret string) {
 	e.GET("/rooms/:id", rh.GetRoomByID())
 	e.DELETE("/rooms/:id", rh.DeleteRoom(), echojwt.JWT([]byte(secret)))
 	e.PUT("/rooms/:id", rh.UpdateRoom(), echojwt.JWT([]byte(secret)))
+}
+
+func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret string) {
+	e.POST("/instruments", ih.AddInstrument(), echojwt.JWT([]byte(secret)))
+	e.GET("/instruments", ih.GetAllInstruments())
+	e.GET("/instruments/:id", ih.GetInstrumentByID())
+	e.PUT("/instruments/:id", ih.UpdateInstrument(), echojwt.JWT([]byte(secret)))
+	e.DELETE("instruments/:id", ih.DeleteInstrument(), echojwt.JWT([]byte(secret)))
 }

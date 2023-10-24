@@ -32,6 +32,7 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		res.Email = input.Email
 		res.Username = input.Username
 		res.Password = input.Password
+		res.Role = "user"
 
 		err := uh.s.Register(*res)
 

@@ -2,8 +2,8 @@ package data
 
 import (
 	"context"
-	"encoding/json"
 	"project/features/rooms"
+	"project/helper"
 
 	"firebase.google.com/go/db"
 )
@@ -54,7 +54,7 @@ func (rd *RoomData) DeleteRoom(roomID string) error {
 
 func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.Rooms, error) {
 	ref := rd.db.NewRef("rooms").Child(roomID)
-	res, err := rd.toMap(updatedRoom)
+	res, err := helper.ToMap(updatedRoom)
 	if err != nil {
 		return nil, err
 	}
@@ -63,17 +63,4 @@ func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.R
 		return nil, err
 	}
 	return &updatedRoom, nil
-}
-
-func (rd *RoomData) toMap(roomData rooms.Rooms) (map[string]interface{}, error) {
-	roomJSON, err := json.Marshal(roomData)
-	if err != nil {
-		return nil, err
-	}
-
-	var roomMap map[string]interface{}
-	if err := json.Unmarshal(roomJSON, &roomMap); err != nil {
-		return nil, err
-	}
-	return roomMap, nil
 }

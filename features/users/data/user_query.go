@@ -22,7 +22,7 @@ func NewUserData(client *db.Client) users.UserDataInterface {
 func (ud *UserData) Insert(newData users.User) error {
 	userError := errors.New("user exists")
 	exist := ud.GetUserByUsername(newData.Username)
-	if exist {
+	if !exist {
 		return userError
 	}
 	ref := ud.db.NewRef("users").Child(newData.Username)

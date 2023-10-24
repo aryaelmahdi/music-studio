@@ -1,13 +1,15 @@
 package rooms
 
-import "github.com/labstack/echo/v4"
+import (
+	"project/features/instruments"
 
-type Instruments map[string]string
+	"github.com/labstack/echo/v4"
+)
 
 type Rooms struct {
-	RoomID      string      `json:"room_id"`
-	Instruments Instruments `json:"instrument"`
-	Price       int         `json:"price"`
+	RoomID      string                     `json:"room_id"`
+	Instruments instruments.InstrumentsMap `json:"instrument"`
+	Price       int                        `json:"price"`
 }
 
 type RoomDataInterface interface {

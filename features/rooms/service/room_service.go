@@ -31,7 +31,7 @@ func (rs *RoomService) DeleteRoom(roomID string) (string, error) {
 	return roomID, nil
 }
 
-func (rs *RoomService) GetAllRooms() ([]rooms.Rooms, error) {
+func (rs *RoomService) GetAllRooms() (*rooms.RoomMap, error) {
 	res, err := rs.d.GetAllRooms()
 	if err != nil {
 		return nil, errors.New("Cannot get rooms data")

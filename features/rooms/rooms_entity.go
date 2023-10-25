@@ -12,10 +12,12 @@ type Rooms struct {
 	Price       int                        `json:"price"`
 }
 
+type RoomMap map[string]interface{}
+
 type RoomDataInterface interface {
 	AddRoom(newRoom Rooms) (*Rooms, error)
 	DeleteRoom(roomID string) error
-	GetAllRooms() ([]Rooms, error)
+	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 }
@@ -23,7 +25,7 @@ type RoomDataInterface interface {
 type RoomService interface {
 	AddRoom(newRoom Rooms) (*Rooms, error)
 	DeleteRoom(roomID string) (string, error)
-	GetAllRooms() ([]Rooms, error)
+	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 }

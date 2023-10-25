@@ -9,14 +9,10 @@ type Instruments struct {
 	Type        string `json:"type"`
 }
 
-type InstrumentsMap map[string]string
-
-type AllInstruments struct {
-	Data map[string]Instruments `json:"instruments"`
-}
+type InstrumentsMap map[string]interface{}
 
 type InstrumentDataInterface interface {
-	GetAllInstruments() (map[string]interface{}, error)
+	GetAllInstruments() (*InstrumentsMap, error)
 	GetInstrumentByID(id string) (*Instruments, error)
 	AddInstrument(newData Instruments) (*Instruments, error)
 	DeleteInstrument(id string) error
@@ -24,7 +20,7 @@ type InstrumentDataInterface interface {
 }
 
 type InstrumentService interface {
-	GetAllInstruments() (map[string]interface{}, error)
+	GetAllInstruments() (*InstrumentsMap, error)
 	GetInstrumentByID(id string) (*Instruments, error)
 	AddInstrument(newData Instruments) (*Instruments, error)
 	DeleteInstrument(id string) error

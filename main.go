@@ -5,6 +5,9 @@ import (
 	id "project/features/instruments/data"
 	ih "project/features/instruments/handler"
 	is "project/features/instruments/service"
+	resd "project/features/reservations/data"
+	resh "project/features/reservations/handler"
+	ress "project/features/reservations/service"
 	rd "project/features/rooms/data"
 	rh "project/features/rooms/handler"
 	rs "project/features/rooms/service"
@@ -43,6 +46,10 @@ func main() {
 	instrumentService := is.NewInstrumentService(instrumentData, jwt)
 	instrumentHandler := ih.NewInstrumentHandler(instrumentService)
 
+	reservationData := resd.NewReservationData(*client)
+	reservationService := ress.NewReservationService(reservationData, jwt)
+	reservationHandler := resh.NewReservationHandler(reservationService)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -54,6 +61,7 @@ func main() {
 	routes.UserRoutes(e, userHandler)
 	routes.RoomRoutes(e, roomHandler, config.SECRET)
 	routes.InstrumentsRoutes(e, instrumentHandler, config.SECRET)
+	routes.ReservationRoutes(e, reservationHandler, config.SECRET)
 
 	e.Logger.Fatal(e.Start(":8080").Error())
 }

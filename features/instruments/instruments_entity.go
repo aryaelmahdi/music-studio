@@ -5,8 +5,8 @@ import "github.com/labstack/echo/v4"
 type Instruments struct {
 	IntrumentID string `json:"instrument_id"`
 	Name        string `json:"name"`
-	Year        int    `json:"year"`
 	Type        string `json:"type"`
+	Year        int    `json:"year"`
 }
 
 type InstrumentsMap map[string]interface{}

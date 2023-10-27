@@ -13,6 +13,8 @@ type Config struct {
 	ProjectID   string
 	SDKPath     string
 	DatabaseURL string
+	MDServerKey string
+	MDClientKey string
 }
 
 func InitConfig() *Config {
@@ -44,6 +46,12 @@ func loadConfig() *Config {
 	}
 	if val, found := os.LookupEnv("DatabaseURL"); found {
 		res.DatabaseURL = val
+	}
+	if val, found := os.LookupEnv("MidtransSandBoxServerKey"); found {
+		res.MDServerKey = val
+	}
+	if val, found := os.LookupEnv("MidtransSandBoxClientKey"); found {
+		res.MDClientKey = val
 	}
 	if val, found := os.LookupEnv("GOOCREDS"); found {
 

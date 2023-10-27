@@ -2,11 +2,12 @@ package routes
 
 import (
 	"project/features/instruments"
+	"project/features/payments"
 	"project/features/reservations"
 	"project/features/rooms"
 	"project/features/users"
 
-	echojwt "github.com/labstack/echo-jwt"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -34,5 +35,9 @@ func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret st
 func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret string) {
 	e.POST("/reservations", rh.AddReservation())
 	e.GET("/reservations", rh.GetAllReservations())
-	e.GET("reservations/:username", rh.GetReservationsByUsername())
+	e.GET("reservations/:username", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
+}
+
+func PaymentRoutes(e *echo.Echo, ph payments.PaymentHandler, secret string) {
+	e.GET("/payment/:id", ph.CreatePayment())
 }

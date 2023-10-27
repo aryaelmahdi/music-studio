@@ -5,6 +5,7 @@ import (
 	"project/features/reservations"
 	"project/helper"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -33,7 +34,7 @@ func (rh *ReservationHandler) GetReservationsByUsername() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		username := c.Param("username")
 		c.Logger().Print("username :", username)
-		res, err := rh.s.GetReservationsByUsername(username)
+		res, err := rh.s.GetReservationsByUsername(username, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("Handler: cannot get reservation by username", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))

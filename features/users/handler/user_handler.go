@@ -28,20 +28,23 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		var res = new(users.User)
-		res.Email = input.Email
-		res.Username = input.Username
-		res.Password = input.Password
-		res.Role = "user"
+		var user = new(users.User)
+		user.Email = input.Email
+		user.Username = input.Username
+		user.Password = input.Password
+		user.Role = "user"
 
-		err := uh.s.Register(*res)
+		err := uh.s.Register(*user)
+
+		var res = new(RegisterResponse)
+		res.Username = user.Username
 
 		if err != nil {
 			c.Logger().Error("handler: input process error:", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res.Username, http.StatusCreated))
+		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}
 }
 

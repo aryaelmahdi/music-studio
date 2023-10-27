@@ -20,10 +20,9 @@ func NewUserData(client *db.Client) users.UserDataInterface {
 }
 
 func (ud *UserData) Insert(newData users.User) error {
-	userError := errors.New("user exists")
-	exist := ud.GetUserByUsername(newData.Username)
-	if !exist {
-		return userError
+	exist := ud.isExists(newData.Username)
+	if exist {
+		return errors.New("user exists")
 	}
 	ref := ud.db.NewRef("users").Child(newData.Username)
 	if err := ref.Set(context.Background(), newData); err != nil {
@@ -48,11 +47,11 @@ func (ud *UserData) Login(username string, password string) (*users.User, error)
 	return &user, nil
 }
 
-func (ud *UserData) GetUserByUsername(username string) bool {
+func (ud *UserData) isExists(username string) bool {
 	ref := ud.db.NewRef("users").Child(username)
 	var user users.User
-	if err := ref.Get(context.Background(), &user); err != nil {
-		return false
+	if err := ref.Get(context.Background(), &user); err == nil {
+		return true
 	}
-	return true
+	return false
 }

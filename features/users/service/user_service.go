@@ -24,6 +24,7 @@ func NewUserService(data users.UserDataInterface, generator helper.GeneratorInte
 
 func (us *UserService) Register(newData users.User) error {
 	err := us.d.Insert(newData)
+	fmt.Println("error", err)
 	if err != nil {
 		return errors.New("insert process failed")
 	}

@@ -28,10 +28,9 @@ func (rs *ReservationService) GetAllReservations() (*reservations.AllReservation
 	return res, nil
 }
 
-func (rs *ReservationService) GetReservationsByUsername(username string, token *jwt.Token) (map[string]any, error) {
-	id, role := rs.j.ExtractToken(token)
-	fmt.Println("id : ", id, ", role : ", role)
-	res, err := rs.d.GetReservationsByUsername(username)
+func (rs *ReservationService) GetReservationsByUsername(token *jwt.Token) (map[string]any, error) {
+	username, _ := rs.j.ExtractToken(token)
+	res, err := rs.d.GetReservationsByUsername(fmt.Sprint(username))
 	if err != nil {
 		return nil, err
 	}

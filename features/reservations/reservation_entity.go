@@ -23,7 +23,7 @@ type ReservationData interface {
 
 type ReservationService interface {
 	GetAllReservations() (*AllReservations, error)
-	GetReservationsByUsername(username string, token *jwt.Token) (map[string]any, error)
+	GetReservationsByUsername(token *jwt.Token) (map[string]any, error)
 	AddReservation(newData Reservation) (*Reservation, error)
 }
 

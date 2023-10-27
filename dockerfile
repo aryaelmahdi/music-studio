@@ -1,11 +1,11 @@
 FROM golang:1.21-alpine
 
-COPY . /app
-
 WORKDIR /app
 
-RUN go mod tidy
+COPY . .
 
-RUN go build -o app .
+RUN go build -o main .
 
-CMD ["/app/app"]
+EXPOSE 8080
+
+CMD ["./main"]

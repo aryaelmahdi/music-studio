@@ -34,8 +34,8 @@ func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret st
 
 func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret string) {
 	e.POST("/reservations", rh.AddReservation())
-	e.GET("/myreservations", rh.GetAllReservations())
-	e.GET("reservations/", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
+	e.GET("/reservations", rh.GetAllReservations(), echojwt.JWT([]byte(secret)))
+	e.GET("/myreservations", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
 }
 
 func PaymentRoutes(e *echo.Echo, ph payments.PaymentHandler, secret string) {

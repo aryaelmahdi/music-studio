@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"project/features/reservations"
 	"project/helper"
@@ -20,7 +21,11 @@ func NewReservationService(data reservations.ReservationData, jwt helper.JWTInte
 	}
 }
 
-func (rs *ReservationService) GetAllReservations() (*reservations.AllReservations, error) {
+func (rs *ReservationService) GetAllReservations(token *jwt.Token) (*reservations.AllReservations, error) {
+	_, role := rs.j.ExtractToken(token)
+	if role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
 	res, err := rs.d.GetAllReservations()
 	if err != nil {
 		return nil, err

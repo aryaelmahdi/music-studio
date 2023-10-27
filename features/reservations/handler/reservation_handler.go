@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"project/features/reservations"
 	"project/helper"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -21,10 +22,14 @@ func NewReservationHandler(service reservations.ReservationService) *Reservation
 
 func (rh *ReservationHandler) GetAllReservations() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		res, err := rh.s.GetAllReservations()
+		res, err := rh.s.GetAllReservations(c.Get("user").(*jwt.Token))
 		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				c.Logger().Error("Handler : Unauthorized user")
+				c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized user", nil, http.StatusUnauthorized))
+			}
 			c.Logger().Error("Hanlder : cannot get reservations", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail to get reservations", nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

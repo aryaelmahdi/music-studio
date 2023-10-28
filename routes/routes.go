@@ -33,7 +33,7 @@ func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret st
 }
 
 func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret string) {
-	e.POST("/reservations", rh.AddReservation())
+	e.POST("/reservations", rh.AddReservation(), echojwt.JWT([]byte(secret)))
 	e.GET("/reservations", rh.GetAllReservations(), echojwt.JWT([]byte(secret)))
 	e.GET("/myreservations", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"project/features/reservations"
 	"project/helper"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -42,9 +43,14 @@ func (rs *ReservationService) GetReservationsByUsername(token *jwt.Token) (map[s
 	return res, nil
 }
 
-func (rs *ReservationService) AddReservation(newData reservations.Reservation) (*reservations.Reservation, error) {
+func (rs *ReservationService) AddReservation(newData reservations.Reservation, token *jwt.Token) (*reservations.Reservation, error) {
+	username, _ := rs.j.ExtractToken(token)
+	newData.Username = fmt.Sprint(username)
 	res, err := rs.d.AddReservation(newData)
 	if err != nil {
+		if strings.Contains(err.Error(), "room reserved") {
+			return nil, err
+		}
 		return nil, err
 	}
 	return res, nil

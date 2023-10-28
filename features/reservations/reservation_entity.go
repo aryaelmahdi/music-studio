@@ -11,6 +11,7 @@ type Reservation struct {
 	Username      string `json:"username"`
 	Price         int    `json:"price"`
 	PaymentStatus string `json:"payment_status"`
+	Date          string `json:"date"`
 }
 
 type AllReservations map[string]interface{}
@@ -24,7 +25,7 @@ type ReservationData interface {
 type ReservationService interface {
 	GetAllReservations(token *jwt.Token) (*AllReservations, error)
 	GetReservationsByUsername(token *jwt.Token) (map[string]any, error)
-	AddReservation(newData Reservation) (*Reservation, error)
+	AddReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
 }
 
 type ReservationHandler interface {

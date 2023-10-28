@@ -48,15 +48,26 @@ func (rh *ReservationHandler) GetReservationsByUsername() echo.HandlerFunc {
 
 func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input reservations.Reservation
+		var input ReservationRequest
+		var reservationData reservations.Reservation
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler : binding process error ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
-		res, err := rh.s.AddReservation(input)
+
+		if err := helper.CaompareDate(input.Date); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil, http.StatusBadRequest))
+		}
+
+		reservationData.Date = input.Date
+		reservationData.PaymentStatus = input.PaymentStatus
+		reservationData.ReservationID = input.ReservationID
+		reservationData.RoomID = input.RoomID
+
+		res, err := rh.s.AddReservation(reservationData, c.Get("user").(*jwt.Token))
 		if err != nil {
-			c.Logger().Error("handler : cannot add reservation", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			c.Logger().Error("handler : cannot add reservation ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}

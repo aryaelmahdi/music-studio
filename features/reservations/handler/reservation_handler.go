@@ -26,7 +26,7 @@ func (rh *ReservationHandler) GetAllReservations() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "Unauthorized user") {
 				c.Logger().Error("Handler : Unauthorized user")
-				c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized user", nil, http.StatusUnauthorized))
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized user", nil, http.StatusUnauthorized))
 			}
 			c.Logger().Error("Hanlder : cannot get reservations", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail to get reservations", nil, http.StatusBadRequest))

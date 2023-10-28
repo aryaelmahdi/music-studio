@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func CaompareDate(date string) error {
+func CompareDate(date string) error {
 	dateParts := strings.Split(date, "-")
 	if len(dateParts) != 3 {
 		return errors.New("invalid date format")
@@ -22,6 +22,10 @@ func CaompareDate(date string) error {
 
 	if reservationDate.Before(today) {
 		return errors.New("date has passed")
+	}
+
+	if reservationDate == today {
+		return errors.New("date cannot be the same")
 	}
 	return nil
 }

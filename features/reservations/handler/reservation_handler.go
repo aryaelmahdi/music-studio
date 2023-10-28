@@ -55,7 +55,7 @@ func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		if err := helper.CaompareDate(input.Date); err != nil {
+		if err := helper.CompareDate(input.Date); err != nil {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil, http.StatusBadRequest))
 		}
 
@@ -80,7 +80,7 @@ func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
 			c.Logger().Error("handler : binding process error ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, binding process error", nil, http.StatusBadRequest))
 		}
-		if dateError := helper.CaompareDate(input.Date); dateError != nil {
+		if dateError := helper.CompareDate(input.Date); dateError != nil {
 			c.Logger().Error("handler : error comparing data ", dateError.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+dateError.Error(), nil, http.StatusBadRequest))
 		}

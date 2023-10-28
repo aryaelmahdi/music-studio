@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"project/features/reservations"
 	"project/helper"
@@ -58,6 +59,37 @@ func (rd *ReservationData) GetAllReservations() (*reservations.AllReservations, 
 	return &res, nil
 }
 
+func (rd *ReservationData) UpdateReservation(newData map[string]interface{}) (*reservations.Reservation, error) {
+	isValid, price, err := rd.isRoomValid(newData["room_id"].(string))
+	if !isValid || err != nil {
+		return nil, err
+	}
+
+	newData["price"] = price
+
+	isUserValid, err := rd.isUserValid(newData["username"].(string), newData["reservation_id"].(string))
+	if !isUserValid || err != nil {
+		return nil, err
+	}
+
+	dateExists, roomExists := rd.isExist(newData["date"].(string), newData["room_id"].(string))
+	if dateExists && roomExists {
+		return nil, errors.New("room reserved")
+	}
+
+	ref := rd.db.NewRef("reservations").Child(newData["reservation_id"].(string))
+	var res reservations.Reservation
+
+	if err := ref.Update(context.Background(), newData); err != nil {
+		return nil, err
+	}
+
+	if err := ref.Get(context.Background(), &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
 func (rd *ReservationData) GetReservationsByUsername(uname string) (map[string]any, error) {
 	ref := rd.db.NewRef("reservations").OrderByChild("username").EqualTo(&uname)
 	var res map[string]any
@@ -106,4 +138,17 @@ func (rd *ReservationData) isExist(date string, roomID string) (bool, bool) {
 		return true, true
 	}
 	return dateExists, roomExists
+}
+
+func (rd *ReservationData) isUserValid(username string, reservation_id string) (bool, error) {
+	ref := rd.db.NewRef("reservations").Child(reservation_id)
+	var res reservations.Reservation
+	if err := ref.Get(context.Background(), &res); err != nil {
+		return false, err
+	}
+	fmt.Print("res : ", res)
+	if res.Username == username {
+		return true, nil
+	}
+	return false, errors.New("username does not macthed!")
 }

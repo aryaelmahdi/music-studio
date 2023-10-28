@@ -55,3 +55,18 @@ func (rs *ReservationService) AddReservation(newData reservations.Reservation, t
 	}
 	return res, nil
 }
+
+func (rs *ReservationService) UpdateReservation(newData reservations.Reservation, token *jwt.Token) (*reservations.Reservation, error) {
+	username, _ := rs.j.ExtractToken(token)
+	newData.Username = fmt.Sprint(username)
+	dataMap, err := helper.ToMap(newData)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := rs.d.UpdateReservation(dataMap)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

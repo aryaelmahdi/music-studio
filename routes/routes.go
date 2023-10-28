@@ -36,6 +36,7 @@ func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret 
 	e.POST("/reservations", rh.AddReservation(), echojwt.JWT([]byte(secret)))
 	e.GET("/reservations", rh.GetAllReservations(), echojwt.JWT([]byte(secret)))
 	e.GET("/myreservations", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
+	e.PUT("/reservations", rh.UpdateReservation(), echojwt.JWT([]byte(secret)))
 }
 
 func PaymentRoutes(e *echo.Echo, ph payments.PaymentHandler, secret string) {

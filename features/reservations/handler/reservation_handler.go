@@ -72,3 +72,24 @@ func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}
 }
+
+func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input reservations.Reservation
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Error("handler : binding process error ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, binding process error", nil, http.StatusBadRequest))
+		}
+		if dateError := helper.CaompareDate(input.Date); dateError != nil {
+			c.Logger().Error("handler : error comparing data ", dateError.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+dateError.Error(), nil, http.StatusBadRequest))
+		}
+
+		res, err := rh.s.UpdateReservation(input, c.Get("user").(*jwt.Token))
+		if err != nil {
+			c.Logger().Error("handler : error updating data ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}

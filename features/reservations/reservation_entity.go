@@ -20,16 +20,19 @@ type ReservationData interface {
 	GetAllReservations() (*AllReservations, error)
 	GetReservationsByUsername(username string) (map[string]any, error)
 	AddReservation(newData Reservation) (*Reservation, error)
+	UpdateReservation(newData map[string]interface{}) (*Reservation, error)
 }
 
 type ReservationService interface {
 	GetAllReservations(token *jwt.Token) (*AllReservations, error)
 	GetReservationsByUsername(token *jwt.Token) (map[string]any, error)
 	AddReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
+	UpdateReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
 }
 
 type ReservationHandler interface {
 	GetAllReservations() echo.HandlerFunc
 	GetReservationsByUsername() echo.HandlerFunc
 	AddReservation() echo.HandlerFunc
+	UpdateReservation() echo.HandlerFunc
 }

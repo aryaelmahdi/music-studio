@@ -9,7 +9,7 @@ import (
 
 type Rooms struct {
 	RoomID      string                     `json:"room_id"`
-	Instruments instruments.InstrumentsMap `json:"instrument"`
+	Instruments instruments.RoomInstrument `json:"instrument"`
 	Price       int                        `json:"price"`
 }
 
@@ -21,6 +21,7 @@ type RoomDataInterface interface {
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
+	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
 }
 
 type RoomService interface {
@@ -29,6 +30,7 @@ type RoomService interface {
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
+	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
 }
 
 type RoomHandler interface {
@@ -37,4 +39,5 @@ type RoomHandler interface {
 	GetAllRooms() echo.HandlerFunc
 	GetRoomByID() echo.HandlerFunc
 	UpdateRoom() echo.HandlerFunc
+	AddRoomInstrument() echo.HandlerFunc
 }

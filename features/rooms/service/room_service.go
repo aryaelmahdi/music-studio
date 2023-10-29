@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
 
@@ -62,6 +63,18 @@ func (rs *RoomService) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*room
 	res, err := rs.d.UpdateRoom(roomID, updatedRoom)
 	if err != nil {
 		return nil, errors.New("Cannot update room")
+	}
+	return res, nil
+}
+
+func (rs *RoomService) AddRoomInstrument(roomID string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error) {
+	_, role := rs.j.ExtractToken(token)
+	if role != "admin" {
+		return nil, errors.New("Unautorized user")
+	}
+	res, err := rs.d.AddRoomInstrument(roomID, instrumentData)
+	if err != nil {
+		return nil, err
 	}
 	return res, nil
 }

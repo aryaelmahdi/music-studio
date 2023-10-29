@@ -9,6 +9,13 @@ type Instruments struct {
 	Year        int    `json:"year"`
 }
 
+type RoomInstrument struct {
+	Guitar   string `json:"guitar"`
+	Bass     string `json:"bass"`
+	Drum     string `json:"drum"`
+	Keyboard string `json:"keyboard"`
+}
+
 type InstrumentsMap map[string]interface{}
 
 type InstrumentDataInterface interface {

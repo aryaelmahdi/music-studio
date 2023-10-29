@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
 
@@ -76,6 +77,52 @@ func (rd *RoomData) isRoomExist(roomID string) bool {
 	ref.Get(context.Background(), &room)
 	fmt.Println("room : ", room)
 	if room == nil {
+		return false
+	}
+	return true
+}
+
+func (rd *RoomData) AddRoomInstrument(roomID string, instrumentData instruments.RoomInstrument) (any, error) {
+	ref := rd.db.NewRef("rooms/" + roomID).Child("instrument")
+	instrument := make(map[string]any)
+
+	bassExist := rd.isInstrumentExists(instrumentData.Bass)
+	if bassExist {
+		instrument["bass"] = instrumentData.Bass
+	}
+
+	guitarExist := rd.isInstrumentExists(instrumentData.Guitar)
+	if guitarExist {
+		instrument["guitar"] = instrumentData.Guitar
+	}
+
+	keyboardExist := rd.isInstrumentExists(instrumentData.Keyboard)
+	if keyboardExist {
+		instrument["keyboard"] = instrumentData.Keyboard
+	}
+
+	drumExist := rd.isInstrumentExists(instrumentData.Drum)
+	if drumExist {
+		instrument["drum"] = instrumentData.Drum
+	}
+
+	if !bassExist && !guitarExist && !keyboardExist && !drumExist {
+		return nil, errors.New("no instruments found")
+	}
+	if err := ref.Update(context.Background(), instrument); err != nil {
+		return nil, err
+	}
+	return instrument, nil
+}
+
+func (rd *RoomData) isInstrumentExists(instrumentName string) bool {
+	if len(instrumentName) < 1 {
+		return false
+	}
+	ref := rd.db.NewRef("instruments").Child(instrumentName)
+	var instrument map[string]any
+	ref.Get(context.Background(), &instrument)
+	if instrument == nil {
 		return false
 	}
 	return true

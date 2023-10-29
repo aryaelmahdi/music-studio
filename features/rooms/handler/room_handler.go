@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
 	"strings"
@@ -97,5 +98,23 @@ func (rh *RoomHandler) UpdateRoom() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}
+
+func (rh *RoomHandler) AddRoomInstrument() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		var input instruments.RoomInstrument
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.AddRoomInstrument(id, input, c.Get("user").(*jwt.Token))
+		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}
 }

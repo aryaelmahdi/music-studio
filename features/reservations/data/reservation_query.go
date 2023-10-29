@@ -60,12 +60,12 @@ func (rd *ReservationData) GetAllReservations() (*reservations.AllReservations, 
 }
 
 func (rd *ReservationData) UpdateReservation(newData map[string]interface{}) (*reservations.Reservation, error) {
-	isValid, price, err := rd.isRoomValid(newData["room_id"].(string))
+	isValid, room, err := rd.isRoomValid(newData["room_id"].(string))
 	if !isValid || err != nil {
 		return nil, err
 	}
 
-	newData["price"] = price
+	newData["price"] = room["price"]
 
 	isUserValid, err := rd.isUserValid(newData["username"].(string), newData["reservation_id"].(string))
 	if !isUserValid || err != nil {
@@ -107,7 +107,6 @@ func (rd *ReservationData) isRoomValid(roomID string) (bool, map[string]any, err
 		log.Fatal("Cannot get room")
 		return false, room, err
 	}
-	log.Print("get", room)
 	return true, room, nil
 }
 
@@ -127,7 +126,7 @@ func (rd *ReservationData) isExist(date string, roomID string) (bool, bool) {
 			if dateStr, ok := date.(string); ok && dateStr == date {
 				foundData[key] = data
 				dateExists = true
-				if _, roomExists := data["room_id"].(string); roomExists {
+				if room, ok := data["room_id"].(string); ok && room == roomID {
 					roomExists = true
 					break
 				}

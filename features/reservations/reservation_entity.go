@@ -9,7 +9,7 @@ type Reservation struct {
 	ReservationID string `json:"reservation_id"`
 	RoomID        string `json:"room_id"`
 	Username      string `json:"username"`
-	Price         int    `json:"price"`
+	Price         any    `json:"price"`
 	PaymentStatus string `json:"payment_status"`
 	Date          string `json:"date"`
 }

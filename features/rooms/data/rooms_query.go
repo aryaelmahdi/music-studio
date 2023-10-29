@@ -112,7 +112,7 @@ func (rd *RoomData) AddRoomInstrument(roomID string, instrumentData instruments.
 	if err := ref.Update(context.Background(), instrument); err != nil {
 		return nil, err
 	}
-	return instrument, nil
+	return instrumentData, nil
 }
 
 func (rd *RoomData) isInstrumentExists(instrumentName string) bool {

@@ -25,10 +25,17 @@ func (rs *RoomService) AddRoom(newRoom rooms.Rooms, token *jwt.Token) (*rooms.Ro
 	if _, role := rs.j.ExtractToken(token); role != "admin" {
 		return nil, errors.New("Unauthorized user")
 	}
-	res, err := rs.d.AddRoom(newRoom)
+
+	var currentRoom rooms.Rooms
+
+	currentRoom.Price = newRoom.Price
+	currentRoom.RoomID = newRoom.RoomID
+
+	res, err := rs.d.AddRoom(currentRoom)
 	if err != nil {
 		return nil, err
 	}
+
 	return res, nil
 }
 

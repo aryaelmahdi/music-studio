@@ -26,7 +26,7 @@ func (rs *RoomService) AddRoom(newRoom rooms.Rooms, token *jwt.Token) (*rooms.Ro
 	}
 	res, err := rs.d.AddRoom(newRoom)
 	if err != nil {
-		return nil, errors.New("Cannot Add Room")
+		return nil, err
 	}
 	return res, nil
 }

@@ -36,7 +36,7 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
 			}
 			c.Logger().Error("handler: input process error :", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))

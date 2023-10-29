@@ -100,6 +100,14 @@ func (rd *ReservationData) GetReservationsByUsername(uname string) (map[string]a
 	return res, nil
 }
 
+func (rd *ReservationData) DeleteReservation(id string) error {
+	ref := rd.db.NewRef("reservations").Child(id)
+	if err := ref.Delete(context.Background()); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (rd *ReservationData) isRoomValid(roomID string) (bool, map[string]any, error) {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any

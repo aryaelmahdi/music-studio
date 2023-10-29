@@ -21,6 +21,7 @@ type ReservationData interface {
 	GetReservationsByUsername(username string) (map[string]any, error)
 	AddReservation(newData Reservation) (*Reservation, error)
 	UpdateReservation(newData map[string]interface{}) (*Reservation, error)
+	DeleteReservation(id string) error
 }
 
 type ReservationService interface {
@@ -28,6 +29,7 @@ type ReservationService interface {
 	GetReservationsByUsername(token *jwt.Token) (map[string]any, error)
 	AddReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
 	UpdateReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
+	DeleteReservation(id string, token *jwt.Token) error
 }
 
 type ReservationHandler interface {
@@ -35,4 +37,5 @@ type ReservationHandler interface {
 	GetReservationsByUsername() echo.HandlerFunc
 	AddReservation() echo.HandlerFunc
 	UpdateReservation() echo.HandlerFunc
+	DeleteReservation() echo.HandlerFunc
 }

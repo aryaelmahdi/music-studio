@@ -93,3 +93,16 @@ func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}
 }
+
+func (rh *ReservationHandler) DeleteReservation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		if err := rh.s.DeleteReservation(id, c.Get("user").(*jwt.Token)); err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusNoContent, nil)
+	}
+}

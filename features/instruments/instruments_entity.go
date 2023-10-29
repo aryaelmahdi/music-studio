@@ -33,7 +33,7 @@ type InstrumentService interface {
 	GetAllInstruments() (*InstrumentsMap, error)
 	GetInstrumentByID(id string) (*Instruments, error)
 	AddInstrument(newData Instruments, token *jwt.Token) (*Instruments, error)
-	DeleteInstrument(id string) error
+	DeleteInstrument(id string, token *jwt.Token) error
 	UpdateInstrument(id string, newData Instruments) (*Instruments, error)
 }
 

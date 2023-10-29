@@ -48,7 +48,11 @@ func (is *InstrumentService) AddInstrument(newData instruments.Instruments, toke
 	return res, nil
 }
 
-func (is *InstrumentService) DeleteInstrument(id string) error {
+func (is *InstrumentService) DeleteInstrument(id string, token *jwt.Token) error {
+	_, role := is.j.ExtractToken(token)
+	if role != "admin" {
+		return errors.New("Unauthorized user")
+	}
 	err := is.d.DeleteInstrument(id)
 	if err != nil {
 		return errors.New("Cannot delete instrument " + err.Error())

@@ -25,7 +25,7 @@ type RoomDataInterface interface {
 
 type RoomService interface {
 	AddRoom(newRoom Rooms, token *jwt.Token) (*Rooms, error)
-	DeleteRoom(roomID string) (string, error)
+	DeleteRoom(roomID string, token *jwt.Token) (any, error)
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)

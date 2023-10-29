@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"project/features/rooms"
 	"project/helper"
@@ -45,12 +46,16 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := c.Param("id")
-		res, err := rh.s.DeleteRoom(input)
+		res, err := rh.s.DeleteRoom(input, c.Get("user").(*jwt.Token))
 		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				c.Logger().Error("handler: Unauthorized user")
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
 			c.Logger().Error("handler: delete process error:", err.Error())
 		}
 
-		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+res+" deleted", nil, http.StatusNoContent))
+		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+fmt.Sprint(res)+" deleted", nil, http.StatusNoContent))
 	}
 }
 

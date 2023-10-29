@@ -31,10 +31,13 @@ func (rs *RoomService) AddRoom(newRoom rooms.Rooms, token *jwt.Token) (*rooms.Ro
 	return res, nil
 }
 
-func (rs *RoomService) DeleteRoom(roomID string) (string, error) {
+func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) {
+	if _, role := rs.j.ExtractToken(token); role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
 	err := rs.d.DeleteRoom(roomID)
 	if err != nil {
-		return "", errors.New("Cannot delete room")
+		return nil, errors.New("Cannot delete room")
 	}
 	return roomID, nil
 }

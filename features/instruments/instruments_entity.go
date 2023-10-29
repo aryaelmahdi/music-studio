@@ -1,6 +1,9 @@
 package instruments
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
+)
 
 type Instruments struct {
 	IntrumentID string `json:"instrument_id"`
@@ -29,7 +32,7 @@ type InstrumentDataInterface interface {
 type InstrumentService interface {
 	GetAllInstruments() (*InstrumentsMap, error)
 	GetInstrumentByID(id string) (*Instruments, error)
-	AddInstrument(newData Instruments) (*Instruments, error)
+	AddInstrument(newData Instruments, token *jwt.Token) (*Instruments, error)
 	DeleteInstrument(id string) error
 	UpdateInstrument(id string, newData Instruments) (*Instruments, error)
 }

@@ -5,6 +5,7 @@ import (
 	"project/features/instruments"
 	"project/helper"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -49,7 +50,7 @@ func (ih *InstrumentHandler) AddInstrument() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		res, err := ih.s.AddInstrument(input)
+		res, err := ih.s.AddInstrument(input, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("handler : cannot add instruments :" + err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))

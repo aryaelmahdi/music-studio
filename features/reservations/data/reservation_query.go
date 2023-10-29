@@ -38,12 +38,8 @@ func (rd *ReservationData) AddReservation(resData reservations.Reservation) (*re
 	}
 	resData.Price = price
 
-	newRef, err := rd.db.NewRef("reservations").Push(context.Background(), &resData)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := newRef.Set(context.Background(), resData); err != nil {
+	ref := rd.db.NewRef("reservations").Child(resData.RoomID)
+	if err := ref.Set(context.Background(), resData); err != nil {
 		return nil, err
 	}
 
@@ -118,7 +114,7 @@ func (rd *ReservationData) isRoomValid(roomID string) (bool, map[string]any, err
 	return true, room, nil
 }
 
-func (rd *ReservationData) isExist(date string, roomID string) (bool, bool) {
+func (rd *ReservationData) isExist(reservationDate string, roomID string) (bool, bool) {
 	reserved := map[string]map[string]interface{}{}
 	ref := rd.db.NewRef("reservations")
 	err := ref.Get(context.Background(), &reserved)
@@ -131,7 +127,7 @@ func (rd *ReservationData) isExist(date string, roomID string) (bool, bool) {
 	var dateExists bool = false
 	for key, data := range reserved {
 		if date, exists := data["date"]; exists {
-			if dateStr, ok := date.(string); ok && dateStr == date {
+			if dateStr, ok := date.(string); ok && dateStr == reservationDate {
 				foundData[key] = data
 				dateExists = true
 				if room, ok := data["room_id"].(string); ok && room == roomID {

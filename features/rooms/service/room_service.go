@@ -3,19 +3,27 @@ package service
 import (
 	"errors"
 	"project/features/rooms"
+	"project/helper"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type RoomService struct {
 	d rooms.RoomDataInterface
+	j helper.JWTInterface
 }
 
-func NewRoomService(data rooms.RoomDataInterface) rooms.RoomService {
+func NewRoomService(data rooms.RoomDataInterface, jwt helper.JWTInterface) rooms.RoomService {
 	return &RoomService{
 		d: data,
+		j: jwt,
 	}
 }
 
-func (rs *RoomService) AddRoom(newRoom rooms.Rooms) (*rooms.Rooms, error) {
+func (rs *RoomService) AddRoom(newRoom rooms.Rooms, token *jwt.Token) (*rooms.Rooms, error) {
+	if _, role := rs.j.ExtractToken(token); role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
 	res, err := rs.d.AddRoom(newRoom)
 	if err != nil {
 		return nil, errors.New("Cannot Add Room")

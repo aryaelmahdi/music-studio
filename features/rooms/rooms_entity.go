@@ -3,6 +3,7 @@ package rooms
 import (
 	"project/features/instruments"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,7 +24,7 @@ type RoomDataInterface interface {
 }
 
 type RoomService interface {
-	AddRoom(newRoom Rooms) (*Rooms, error)
+	AddRoom(newRoom Rooms, token *jwt.Token) (*Rooms, error)
 	DeleteRoom(roomID string) (string, error)
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)

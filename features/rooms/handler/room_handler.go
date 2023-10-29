@@ -4,7 +4,9 @@ import (
 	"net/http"
 	"project/features/rooms"
 	"project/helper"
+	"strings"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,8 +28,12 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		res, err := rh.s.AddRoom(input)
+		res, err := rh.s.AddRoom(input, c.Get("user").(*jwt.Token))
 		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				c.Logger().Error("handler: Unauthorized user")
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
 			c.Logger().Error("handler: input process error :", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}

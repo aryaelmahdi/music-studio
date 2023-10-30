@@ -4,6 +4,8 @@ import (
 	"errors"
 	"project/features/instruments"
 	"project/helper"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type InstrumentService struct {
@@ -34,15 +36,23 @@ func (is *InstrumentService) GetInstrumentByID(id string) (*instruments.Instrume
 	return res, nil
 }
 
-func (is *InstrumentService) AddInstrument(newData instruments.Instruments) (*instruments.Instruments, error) {
+func (is *InstrumentService) AddInstrument(newData instruments.Instruments, token *jwt.Token) (*instruments.Instruments, error) {
+	_, role := is.j.ExtractToken(token)
+	if role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
 	res, err := is.d.AddInstrument(newData)
 	if err != nil {
-		return nil, errors.New("Canont Add instrument " + err.Error())
+		return nil, errors.New("Cannot Add instrument " + err.Error())
 	}
 	return res, nil
 }
 
-func (is *InstrumentService) DeleteInstrument(id string) error {
+func (is *InstrumentService) DeleteInstrument(id string, token *jwt.Token) error {
+	_, role := is.j.ExtractToken(token)
+	if role != "admin" {
+		return errors.New("Unauthorized user")
+	}
 	err := is.d.DeleteInstrument(id)
 	if err != nil {
 		return errors.New("Cannot delete instrument " + err.Error())
@@ -50,7 +60,11 @@ func (is *InstrumentService) DeleteInstrument(id string) error {
 	return nil
 }
 
-func (is *InstrumentService) UpdateInstrument(id string, newData instruments.Instruments) (*instruments.Instruments, error) {
+func (is *InstrumentService) UpdateInstrument(id string, newData instruments.Instruments, token *jwt.Token) (*instruments.Instruments, error) {
+	_, role := is.j.ExtractToken(token)
+	if role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
 	res, err := is.d.UpdateInstrument(id, newData)
 	if err != nil {
 		return nil, errors.New("Cannot update instrument" + err.Error())

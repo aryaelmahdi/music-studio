@@ -43,7 +43,7 @@ func main() {
 	userHandler := uh.NewUserHandler(userServices)
 
 	roomData := rd.NewRoomData(client)
-	roomServices := rs.NewRoomService(roomData)
+	roomServices := rs.NewRoomService(roomData, jwt)
 	roomHandler := rh.NewRoomHandler(roomServices)
 
 	instrumentData := id.NewInstrumentData(client)

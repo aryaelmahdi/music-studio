@@ -32,3 +32,25 @@ func ExtractPrice(room map[string]interface{}) (int, error) {
 	price := int(priceFloat)
 	return price, nil
 }
+
+func PaginateMap(data map[string]any, page int, pageSize int) map[string]any {
+	startIndex := (page - 1) * pageSize
+	endIndex := page * pageSize
+	if startIndex >= len(data) {
+		return nil
+	}
+	if endIndex > len(data) {
+		endIndex = len(data)
+	}
+
+	result := make(map[string]any)
+	i := 0
+	for key, value := range data {
+		if i >= startIndex && i < endIndex {
+			result[key] = value
+		}
+		i++
+	}
+
+	return result
+}

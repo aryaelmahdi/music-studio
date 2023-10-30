@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
@@ -50,7 +51,8 @@ func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) 
 	return roomID, nil
 }
 
-func (rs *RoomService) GetAllRooms() (*rooms.RoomMap, error) {
+func (rs *RoomService) GetAllRooms() (map[string]any, error) {
+	fmt.Println("masuk all")
 	res, err := rs.d.GetAllRooms()
 	if err != nil {
 		return nil, errors.New("Cannot get rooms data")
@@ -62,6 +64,9 @@ func (rs *RoomService) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 	res, err := rs.d.GetRoomByID(roomID)
 	if err != nil {
 		return nil, errors.New("Cannot get room data")
+	}
+	if res.RoomID == "" {
+		return nil, errors.New("No data")
 	}
 	return res, nil
 }
@@ -84,4 +89,17 @@ func (rs *RoomService) AddRoomInstrument(roomID string, instrumentData instrumen
 		return nil, err
 	}
 	return res, nil
+}
+
+func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error) {
+	fmt.Println("masuk filter")
+	res, err := rs.d.FilterRoomByPrice(price)
+	if err != nil {
+		return nil, err
+	}
+	if len(res) == 0 {
+		return nil, errors.New("No data")
+	}
+	paginatedRes := helper.PaginateMap(res, page, pageSize)
+	return paginatedRes, nil
 }

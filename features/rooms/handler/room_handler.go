@@ -6,6 +6,7 @@ import (
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -62,9 +63,29 @@ func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 
 func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		res, err := rh.s.GetAllRooms()
+		queryPrice := c.QueryParam("max_price")
+		page, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail", nil, http.StatusInternalServerError))
+			page = 1
+		}
+		pageSize, err := strconv.Atoi(c.QueryParam("page_size"))
+		if err != nil {
+			pageSize = 5
+		}
+		if queryPrice == "" {
+			res, err := rh.s.GetAllRooms()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
+			}
+			return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+		}
+		price, err := strconv.Atoi(queryPrice)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.FilterRoomByPrice(price, page, pageSize)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}
@@ -76,7 +97,7 @@ func (rh *RoomHandler) GetRoomByID() echo.HandlerFunc {
 		res, err := rh.s.GetRoomByID(input)
 		if err != nil {
 			c.Logger().Error("handler: get process error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

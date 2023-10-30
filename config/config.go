@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,9 +18,12 @@ type Config struct {
 }
 
 func InitConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		logrus.Fatal("Error loading .env file")
+	_, err := os.Stat(".env")
+	if err == nil {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Failed to fetch .env file")
+		}
 	}
 
 	res := new(Config)

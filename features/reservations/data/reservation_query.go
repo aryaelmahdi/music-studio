@@ -38,7 +38,7 @@ func (rd *ReservationData) AddReservation(resData reservations.Reservation) (*re
 	}
 	resData.Price = price
 
-	ref := rd.db.NewRef("reservations").Child(resData.RoomID)
+	ref := rd.db.NewRef("reservations").Child(resData.Date + resData.RoomID)
 	if err := ref.Set(context.Background(), resData); err != nil {
 		return nil, err
 	}

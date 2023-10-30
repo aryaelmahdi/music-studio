@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -18,7 +17,6 @@ type Config struct {
 }
 
 func InitConfig() *Config {
-	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
 		logrus.Fatal("Error loading .env file")
@@ -54,6 +52,7 @@ func loadConfig() *Config {
 		res.MDClientKey = val
 	}
 	if val, found := os.LookupEnv("GOOCREDS"); found {
+		jsonBytes := []byte(val)
 
 		file, err := os.Create("credentials.json")
 		if err != nil {
@@ -61,10 +60,11 @@ func loadConfig() *Config {
 		}
 		defer file.Close()
 
-		_, err = io.WriteString(file, val)
+		_, err = file.Write(jsonBytes)
 		if err != nil {
 			panic(err)
 		}
 	}
+
 	return res
 }

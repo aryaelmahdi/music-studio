@@ -94,5 +94,8 @@ func (rs *RoomService) FilterRoomByPrice(price int) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(res) == 0 {
+		return nil, errors.New("No data")
+	}
 	return res, nil
 }

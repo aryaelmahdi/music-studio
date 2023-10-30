@@ -77,7 +77,7 @@ func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 		}
 		res, err := rh.s.FilterRoomByPrice(price)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

@@ -22,6 +22,7 @@ type ReservationData interface {
 	AddReservation(newData Reservation) (*Reservation, error)
 	UpdateReservation(newData map[string]interface{}) (*Reservation, error)
 	DeleteReservation(id string) error
+	GetReservationByID(id string) (*Reservation, error)
 }
 
 type ReservationService interface {
@@ -30,6 +31,7 @@ type ReservationService interface {
 	AddReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
 	UpdateReservation(newData Reservation, token *jwt.Token) (*Reservation, error)
 	DeleteReservation(id string, token *jwt.Token) error
+	GetReservationByID(id string) (*Reservation, error)
 }
 
 type ReservationHandler interface {

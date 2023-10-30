@@ -89,7 +89,7 @@ func (rh *RoomHandler) GetRoomByID() echo.HandlerFunc {
 		res, err := rh.s.GetRoomByID(input)
 		if err != nil {
 			c.Logger().Error("handler: get process error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

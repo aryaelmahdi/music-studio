@@ -65,6 +65,9 @@ func (rs *RoomService) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 	if err != nil {
 		return nil, errors.New("Cannot get room data")
 	}
+	if res.RoomID == "" {
+		return nil, errors.New("No data")
+	}
 	return res, nil
 }
 

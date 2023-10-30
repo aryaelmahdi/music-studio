@@ -104,6 +104,15 @@ func (rd *ReservationData) DeleteReservation(id string) error {
 	return nil
 }
 
+func (rd *ReservationData) GetReservationByID(id string) (*reservations.Reservation, error) {
+	ref := rd.db.NewRef("reservations").Child(id)
+	var reservation reservations.Reservation
+	if err := ref.Get(context.Background(), &reservation); err != nil {
+		return nil, errors.New("invalid reservation id")
+	}
+	return &reservation, nil
+}
+
 func (rd *ReservationData) isRoomValid(roomID string) (bool, map[string]any, error) {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any

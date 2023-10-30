@@ -21,13 +21,13 @@ func NewRoomData(client *db.Client) rooms.RoomDataInterface {
 	}
 }
 
-func (rd *RoomData) GetAllRooms() (*rooms.RoomMap, error) {
+func (rd *RoomData) GetAllRooms() (map[string]any, error) {
 	ref := rd.db.NewRef("rooms")
-	var rooms rooms.RoomMap
+	rooms := make(map[string]any)
 	if err := ref.Get(context.Background(), &rooms); err != nil {
 		return nil, err
 	}
-	return &rooms, nil
+	return rooms, nil
 }
 
 func (rd *RoomData) GetRoomByID(roomID string) (*rooms.Rooms, error) {
@@ -69,6 +69,15 @@ func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.R
 		return nil, err
 	}
 	return &updatedRoom, nil
+}
+
+func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
+	rooms := make(map[string]any)
+	ref := rd.db.NewRef("rooms")
+	if err := ref.OrderByChild("price").EndAt(price).Get(context.Background(), &rooms); err != nil {
+		return nil, err
+	}
+	return rooms, nil
 }
 
 func (rd *RoomData) isRoomExist(roomID string) bool {

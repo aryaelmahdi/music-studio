@@ -81,3 +81,15 @@ func (rs *ReservationService) DeleteReservation(id string, token *jwt.Token) err
 	}
 	return nil
 }
+
+func (rd *ReservationService) GetReservationByID(id string, token *jwt.Token) (*reservations.Reservation, error) {
+	username, role := rd.j.ExtractToken(token)
+	res, err := rd.d.GetReservationByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if res.Username != username && role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
+	return res, nil
+}

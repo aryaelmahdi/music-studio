@@ -3,12 +3,13 @@ package rooms
 import (
 	"project/features/instruments"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
 type Rooms struct {
 	RoomID      string                     `json:"room_id"`
-	Instruments instruments.InstrumentsMap `json:"instrument"`
+	Instruments instruments.RoomInstrument `json:"instrument"`
 	Price       int                        `json:"price"`
 }
 
@@ -20,14 +21,16 @@ type RoomDataInterface interface {
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
+	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
 }
 
 type RoomService interface {
-	AddRoom(newRoom Rooms) (*Rooms, error)
-	DeleteRoom(roomID string) (string, error)
+	AddRoom(newRoom Rooms, token *jwt.Token) (*Rooms, error)
+	DeleteRoom(roomID string, token *jwt.Token) (any, error)
 	GetAllRooms() (*RoomMap, error)
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
+	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
 }
 
 type RoomHandler interface {
@@ -36,4 +39,5 @@ type RoomHandler interface {
 	GetAllRooms() echo.HandlerFunc
 	GetRoomByID() echo.HandlerFunc
 	UpdateRoom() echo.HandlerFunc
+	AddRoomInstrument() echo.HandlerFunc
 }

@@ -26,7 +26,7 @@ func (rh *ReservationHandler) GetAllReservations() echo.HandlerFunc {
 		if err != nil {
 			if strings.Contains(err.Error(), "Unauthorized user") {
 				c.Logger().Error("Handler : Unauthorized user")
-				c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized user", nil, http.StatusUnauthorized))
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized user", nil, http.StatusUnauthorized))
 			}
 			c.Logger().Error("Hanlder : cannot get reservations", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail to get reservations", nil, http.StatusBadRequest))
@@ -48,16 +48,61 @@ func (rh *ReservationHandler) GetReservationsByUsername() echo.HandlerFunc {
 
 func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input reservations.Reservation
+		var input ReservationRequest
+		var reservationData reservations.Reservation
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler : binding process error ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
-		res, err := rh.s.AddReservation(input)
+
+		if err := helper.CompareDate(input.Date); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil, http.StatusBadRequest))
+		}
+
+		reservationData.Date = input.Date
+		reservationData.PaymentStatus = input.PaymentStatus
+		reservationData.ReservationID = input.ReservationID
+		reservationData.RoomID = input.RoomID
+
+		res, err := rh.s.AddReservation(reservationData, c.Get("user").(*jwt.Token))
 		if err != nil {
-			c.Logger().Error("handler : cannot add reservation", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			c.Logger().Error("handler : cannot add reservation ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
+	}
+}
+
+func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input reservations.Reservation
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Error("handler : binding process error ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, binding process error", nil, http.StatusBadRequest))
+		}
+		if dateError := helper.CompareDate(input.Date); dateError != nil {
+			c.Logger().Error("handler : error comparing data ", dateError.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+dateError.Error(), nil, http.StatusBadRequest))
+		}
+
+		res, err := rh.s.UpdateReservation(input, c.Get("user").(*jwt.Token))
+		if err != nil {
+			c.Logger().Error("handler : error updating data ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}
+
+func (rh *ReservationHandler) DeleteReservation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		if err := rh.s.DeleteReservation(id, c.Get("user").(*jwt.Token)); err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusNoContent, nil)
 	}
 }

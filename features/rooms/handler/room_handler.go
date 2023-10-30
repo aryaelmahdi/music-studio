@@ -1,10 +1,14 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
+	"strings"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,10 +30,14 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
-		res, err := rh.s.AddRoom(input)
+		res, err := rh.s.AddRoom(input, c.Get("user").(*jwt.Token))
 		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				c.Logger().Error("handler: Unauthorized user")
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
 			c.Logger().Error("handler: input process error :", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
@@ -39,12 +47,16 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := c.Param("id")
-		res, err := rh.s.DeleteRoom(input)
+		res, err := rh.s.DeleteRoom(input, c.Get("user").(*jwt.Token))
 		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				c.Logger().Error("handler: Unauthorized user")
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
 			c.Logger().Error("handler: delete process error:", err.Error())
 		}
 
-		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+res+" deleted", nil, http.StatusNoContent))
+		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+fmt.Sprint(res)+" deleted", nil, http.StatusNoContent))
 	}
 }
 
@@ -86,5 +98,23 @@ func (rh *RoomHandler) UpdateRoom() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}
+
+func (rh *RoomHandler) AddRoomInstrument() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		var input instruments.RoomInstrument
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.AddRoomInstrument(id, input, c.Get("user").(*jwt.Token))
+		if err != nil {
+			if strings.Contains(err.Error(), "Unauthorized user") {
+				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
+			}
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}
 }

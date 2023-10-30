@@ -22,6 +22,7 @@ func RoomRoutes(e *echo.Echo, rh rooms.RoomHandler, secret string) {
 	e.GET("/rooms/:id", rh.GetRoomByID())
 	e.DELETE("/rooms/:id", rh.DeleteRoom(), echojwt.JWT([]byte(secret)))
 	e.PUT("/rooms/:id", rh.UpdateRoom(), echojwt.JWT([]byte(secret)))
+	e.POST("/rooms/:id", rh.AddRoomInstrument(), echojwt.JWT([]byte(secret)))
 }
 
 func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret string) {
@@ -33,9 +34,11 @@ func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret st
 }
 
 func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret string) {
-	e.POST("/reservations", rh.AddReservation())
+	e.POST("/reservations", rh.AddReservation(), echojwt.JWT([]byte(secret)))
 	e.GET("/reservations", rh.GetAllReservations(), echojwt.JWT([]byte(secret)))
 	e.GET("/myreservations", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
+	e.PUT("/reservations", rh.UpdateReservation(), echojwt.JWT([]byte(secret)))
+	e.DELETE("/reservations/:id", rh.DeleteReservation(), echojwt.JWT([]byte(secret)))
 }
 
 func PaymentRoutes(e *echo.Echo, ph payments.PaymentHandler, secret string) {

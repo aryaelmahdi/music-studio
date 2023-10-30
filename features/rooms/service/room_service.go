@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
@@ -51,6 +52,7 @@ func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) 
 }
 
 func (rs *RoomService) GetAllRooms() (*rooms.RoomMap, error) {
+	fmt.Println("masuk all")
 	res, err := rs.d.GetAllRooms()
 	if err != nil {
 		return nil, errors.New("Cannot get rooms data")
@@ -80,6 +82,15 @@ func (rs *RoomService) AddRoomInstrument(roomID string, instrumentData instrumen
 		return nil, errors.New("Unautorized user")
 	}
 	res, err := rs.d.AddRoomInstrument(roomID, instrumentData)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (rs *RoomService) FilterRoomByPrice(price int) (map[string]any, error) {
+	fmt.Println("masuk filter")
+	res, err := rs.d.FilterRoomByPrice(price)
 	if err != nil {
 		return nil, err
 	}

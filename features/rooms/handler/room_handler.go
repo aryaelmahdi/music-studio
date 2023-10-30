@@ -6,6 +6,7 @@ import (
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -62,9 +63,21 @@ func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 
 func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		res, err := rh.s.GetAllRooms()
+		queryPrice := c.QueryParam("max_price")
+		if queryPrice == "" {
+			res, err := rh.s.GetAllRooms()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
+			}
+			return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+		}
+		price, err := strconv.Atoi(queryPrice)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail", nil, http.StatusInternalServerError))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.FilterRoomByPrice(price)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

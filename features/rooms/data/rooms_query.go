@@ -71,6 +71,15 @@ func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.R
 	return &updatedRoom, nil
 }
 
+func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
+	rooms := make(map[string]any)
+	ref := rd.db.NewRef("rooms")
+	if err := ref.OrderByChild("price").EndAt(price).Get(context.Background(), &rooms); err != nil {
+		return nil, err
+	}
+	return rooms, nil
+}
+
 func (rd *RoomData) isRoomExist(roomID string) bool {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any

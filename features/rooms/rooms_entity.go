@@ -22,6 +22,7 @@ type RoomDataInterface interface {
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
+	FilterRoomByPrice(price int) (map[string]any, error)
 }
 
 type RoomService interface {
@@ -31,6 +32,7 @@ type RoomService interface {
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
+	FilterRoomByPrice(price int) (map[string]any, error)
 }
 
 type RoomHandler interface {

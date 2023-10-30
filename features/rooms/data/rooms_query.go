@@ -21,13 +21,13 @@ func NewRoomData(client *db.Client) rooms.RoomDataInterface {
 	}
 }
 
-func (rd *RoomData) GetAllRooms() (*rooms.RoomMap, error) {
+func (rd *RoomData) GetAllRooms() (map[string]any, error) {
 	ref := rd.db.NewRef("rooms")
-	var rooms rooms.RoomMap
+	rooms := make(map[string]any)
 	if err := ref.Get(context.Background(), &rooms); err != nil {
 		return nil, err
 	}
-	return &rooms, nil
+	return rooms, nil
 }
 
 func (rd *RoomData) GetRoomByID(roomID string) (*rooms.Rooms, error) {

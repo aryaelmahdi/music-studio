@@ -64,6 +64,14 @@ func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		queryPrice := c.QueryParam("max_price")
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 1
+		}
+		pageSize, err := strconv.Atoi(c.QueryParam("page_size"))
+		if err != nil {
+			pageSize = 5
+		}
 		if queryPrice == "" {
 			res, err := rh.s.GetAllRooms()
 			if err != nil {
@@ -75,7 +83,7 @@ func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
-		res, err := rh.s.FilterRoomByPrice(price)
+		res, err := rh.s.FilterRoomByPrice(price, page, pageSize)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusBadRequest))
 		}

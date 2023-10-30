@@ -51,7 +51,7 @@ func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) 
 	return roomID, nil
 }
 
-func (rs *RoomService) GetAllRooms() (*rooms.RoomMap, error) {
+func (rs *RoomService) GetAllRooms() (map[string]any, error) {
 	fmt.Println("masuk all")
 	res, err := rs.d.GetAllRooms()
 	if err != nil {
@@ -91,7 +91,7 @@ func (rs *RoomService) AddRoomInstrument(roomID string, instrumentData instrumen
 	return res, nil
 }
 
-func (rs *RoomService) FilterRoomByPrice(price int) (map[string]any, error) {
+func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error) {
 	fmt.Println("masuk filter")
 	res, err := rs.d.FilterRoomByPrice(price)
 	if err != nil {
@@ -100,5 +100,6 @@ func (rs *RoomService) FilterRoomByPrice(price int) (map[string]any, error) {
 	if len(res) == 0 {
 		return nil, errors.New("No data")
 	}
-	return res, nil
+	paginatedRes := helper.PaginateMap(res, page, pageSize)
+	return paginatedRes, nil
 }

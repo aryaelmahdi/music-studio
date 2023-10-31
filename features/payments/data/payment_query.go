@@ -3,10 +3,12 @@ package data
 import (
 	"context"
 	"fmt"
+	"net/smtp"
 	"project/features/reservations"
 	"project/features/users"
 
 	"firebase.google.com/go/db"
+	"firebase.google.com/go/messaging"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 )
@@ -14,12 +16,14 @@ import (
 type PaymentData struct {
 	client *snap.Client
 	db     *db.Client
+	fcm    *messaging.Client
 }
 
-func NewPaymentData(client snap.Client, database *db.Client) *PaymentData {
+func NewPaymentData(client *snap.Client, database *db.Client, messageClient *messaging.Client) *PaymentData {
 	return &PaymentData{
-		client: &client,
+		client: client,
 		db:     database,
+		fcm:    messageClient,
 	}
 }
 
@@ -41,22 +45,23 @@ func (pd *PaymentData) GetUserEmail(username string) (string, error) {
 	return user.Email, nil
 }
 
-func (pd *PaymentData) CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, error) {
-	chargeReq := generateSnapReq(reservationID, username, email, price)
+func (pd *PaymentData) CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, string, error) {
+	orderID := "GSM" + reservationID
+	chargeReq := generateSnapReq(orderID, username, email, price)
 	fmt.Println("price : ", price)
 	res, err := pd.client.CreateTransaction(chargeReq)
 	if err != nil {
 		fmt.Println("Error:", err.GetMessage())
-		return nil, err
+		return nil, "", err
 	}
 	fmt.Println("Snap response:", res)
-	return res, nil
+	return res, orderID, nil
 }
 
-func generateSnapReq(reservationID string, username string, email string, price int) *snap.Request {
+func generateSnapReq(orderID string, username string, email string, price int) *snap.Request {
 	snapReq := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  reservationID,
+			OrderID:  orderID,
 			GrossAmt: int64(price),
 		},
 		CustomerDetail: &midtrans.CustomerDetails{
@@ -66,4 +71,21 @@ func generateSnapReq(reservationID string, username string, email string, price 
 		EnabledPayments: snap.AllSnapPaymentType,
 	}
 	return snapReq
+}
+
+func (pd *PaymentData) SendEmail(smtpUser string, smtpPassword string, smtpServer string, smtpPort string, receiver []string, msg string) error {
+	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpServer)
+	err := smtp.SendMail(smtpServer+":"+smtpPort, auth, smtpUser, receiver, []byte(msg))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pd *PaymentData) SendMessage(message *messaging.Message) error {
+	_, err := pd.fcm.Send(context.Background(), message)
+	if err != nil {
+		return err
+	}
+	return nil
 }

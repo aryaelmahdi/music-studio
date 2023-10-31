@@ -6,10 +6,9 @@ import (
 )
 
 type Instruments struct {
-	IntrumentID string `json:"instrument_id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Year        int    `json:"year"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Year int    `json:"year"`
 }
 
 type RoomInstrument struct {
@@ -27,6 +26,7 @@ type InstrumentDataInterface interface {
 	AddInstrument(newData Instruments) (*Instruments, error)
 	DeleteInstrument(id string) error
 	UpdateInstrument(id string, newData Instruments) (*Instruments, error)
+	IsInstrumentExist(instrumentName string) bool
 }
 
 type InstrumentService interface {

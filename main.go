@@ -27,10 +27,10 @@ import (
 
 func main() {
 	e := echo.New()
-	cfg := config.InitConfig()
+	cfg, smtp := config.InitConfig()
 	mdClient := config.MidtransConfig(cfg.MDServerKey)
 
-	db, client := database.InitFirebaseApp(cfg.SDKPath, cfg.ProjectID, cfg.DatabaseURL)
+	db, client, fcm := database.InitFirebaseApp(cfg.SDKPath, cfg.ProjectID, cfg.DatabaseURL)
 	if db == nil {
 		e.Logger.Fatal("db nil")
 	}
@@ -54,8 +54,8 @@ func main() {
 	reservationService := ress.NewReservationService(reservationData, jwt)
 	reservationHandler := resh.NewReservationHandler(reservationService)
 
-	paymentData := pd.NewPaymentData(*mdClient, client)
-	paymentService := ps.NewPaymentService(paymentData, jwt)
+	paymentData := pd.NewPaymentData(mdClient, client, fcm)
+	paymentService := ps.NewPaymentService(paymentData, jwt, *smtp)
 	paymentHandler := ph.NewPaymentHandler(paymentService)
 
 	e.Pre(middleware.RemoveTrailingSlash())

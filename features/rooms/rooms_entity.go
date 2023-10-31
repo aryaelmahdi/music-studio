@@ -23,6 +23,7 @@ type RoomDataInterface interface {
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
 	FilterRoomByPrice(price int) (map[string]any, error)
+	IsRoomExist(roomID string) bool
 }
 
 type RoomService interface {

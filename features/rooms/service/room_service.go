@@ -44,6 +44,11 @@ func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) 
 	if _, role := rs.j.ExtractToken(token); role != "admin" {
 		return nil, errors.New("Unauthorized user")
 	}
+
+	if roomExists := rs.d.IsRoomExist(roomID); !roomExists {
+		return nil, errors.New("Invalid id")
+	}
+
 	err := rs.d.DeleteRoom(roomID)
 	if err != nil {
 		return nil, errors.New("Cannot delete room")

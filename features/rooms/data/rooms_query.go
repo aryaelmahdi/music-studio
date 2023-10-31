@@ -40,7 +40,7 @@ func (rd *RoomData) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 }
 
 func (rd *RoomData) AddRoom(newRoom rooms.Rooms) (*rooms.Rooms, error) {
-	if roomExists := rd.isRoomExist(newRoom.RoomID); roomExists {
+	if roomExists := rd.IsRoomExist(newRoom.RoomID); roomExists {
 		return nil, errors.New("room already exists")
 	}
 	ref := rd.db.NewRef("rooms").Child(newRoom.RoomID)
@@ -80,7 +80,7 @@ func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
 	return rooms, nil
 }
 
-func (rd *RoomData) isRoomExist(roomID string) bool {
+func (rd *RoomData) IsRoomExist(roomID string) bool {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any
 	ref.Get(context.Background(), &room)

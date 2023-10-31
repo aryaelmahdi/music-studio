@@ -118,3 +118,33 @@ func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) (map
 	paginatedRes := helper.PaginateMap(res, page, pageSize)
 	return paginatedRes, nil
 }
+
+func (rs *RoomService) GetBookedRooms(page int, pageSize int) ([]map[string]any, error) {
+	reserved, err := rs.d.GetBookedRooms()
+	if err != nil {
+		return nil, err
+	}
+	dataSlices := make([]map[string]interface{}, 0)
+
+	for _, data := range reserved {
+		date, dateExists := data["date"]
+		room, roomExists := data["room_id"]
+
+		if dateExists && roomExists {
+			if dateStr, ok := date.(string); ok {
+				if roomID, ok := room.(string); ok {
+					newData := map[string]interface{}{
+						"date":    dateStr,
+						"room_id": roomID,
+					}
+					dataSlices = append(dataSlices, newData)
+				}
+			}
+		}
+	}
+	res, err := helper.Paginate(dataSlices, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

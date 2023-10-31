@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
@@ -78,6 +79,17 @@ func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
 		return nil, err
 	}
 	return rooms, nil
+}
+
+func (rd *RoomData) GetBookedRooms() (map[string]map[string]interface{}, error) {
+	reserved := map[string]map[string]interface{}{}
+	ref := rd.db.NewRef("reservations")
+	err := ref.Get(context.Background(), &reserved)
+	if err != nil {
+		log.Fatalf("Error reading data: %v", err)
+		return nil, err
+	}
+	return reserved, nil
 }
 
 func (rd *RoomData) IsRoomExist(roomID string) bool {

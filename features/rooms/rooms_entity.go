@@ -24,6 +24,7 @@ type RoomDataInterface interface {
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
 	FilterRoomByPrice(price int) (map[string]any, error)
 	IsRoomExist(roomID string) bool
+	GetBookedRooms() (map[string]map[string]interface{}, error)
 }
 
 type RoomService interface {
@@ -34,6 +35,7 @@ type RoomService interface {
 	UpdateRoom(roomID string, updatedRoom Rooms, token *jwt.Token) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
 	FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error)
+	GetBookedRooms(page int, pageSize int) ([]map[string]any, error)
 }
 
 type RoomHandler interface {
@@ -43,4 +45,5 @@ type RoomHandler interface {
 	GetRoomByID() echo.HandlerFunc
 	UpdateRoom() echo.HandlerFunc
 	AddRoomInstrument() echo.HandlerFunc
+	GetBookedRooms() echo.HandlerFunc
 }

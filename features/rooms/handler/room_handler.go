@@ -140,3 +140,22 @@ func (rh *RoomHandler) AddRoomInstrument() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
 	}
 }
+
+func (rh *RoomHandler) GetBookedRooms() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 1
+		}
+		pageSize, err := strconv.Atoi(c.QueryParam("page_size"))
+		if err != nil {
+			pageSize = 100
+		}
+		res, err := rh.s.GetBookedRooms(page, pageSize)
+		if err != nil {
+			c.Logger().Error("handler : cannot get booked rooms, " + err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}

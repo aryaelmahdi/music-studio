@@ -22,7 +22,7 @@ type RoomDataInterface interface {
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument) (any, error)
-	FilterRoomByPrice(price int) (map[string]any, error)
+	FilterRoomByPrice(price int) (map[string]map[string]interface{}, error)
 	IsRoomExist(roomID string) bool
 	GetBookedRooms() (map[string]map[string]interface{}, error)
 }
@@ -34,7 +34,7 @@ type RoomService interface {
 	GetRoomByID(roomID string) (*Rooms, error)
 	UpdateRoom(roomID string, updatedRoom Rooms, token *jwt.Token) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
-	FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error)
+	FilterRoomByPrice(price int, page int, pageSize int) ([]map[string]any, error)
 	GetBookedRooms(page int, pageSize int) ([]map[string]any, error)
 }
 

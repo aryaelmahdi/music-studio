@@ -106,8 +106,7 @@ func (rs *RoomService) AddRoomInstrument(roomID string, instrumentData instrumen
 	return res, nil
 }
 
-func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error) {
-	fmt.Println("masuk filter")
+func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) ([]map[string]any, error) {
 	res, err := rs.d.FilterRoomByPrice(price)
 	if err != nil {
 		return nil, err
@@ -115,7 +114,18 @@ func (rs *RoomService) FilterRoomByPrice(price int, page int, pageSize int) (map
 	if len(res) == 0 {
 		return nil, errors.New("No data")
 	}
-	paginatedRes := helper.PaginateMap(res, page, pageSize)
+	dataSlices := make([]map[string]any, 0)
+
+	for _, data := range res {
+		if _, exists := data["room_id"]; exists {
+			dataSlices = append(dataSlices, data)
+		}
+	}
+
+	paginatedRes, err := helper.Paginate(dataSlices, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
 	return paginatedRes, nil
 }
 

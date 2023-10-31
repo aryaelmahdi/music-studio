@@ -6,7 +6,6 @@ import (
 )
 
 type Reservation struct {
-	ReservationID string `json:"reservation_id"`
 	RoomID        string `json:"room_id"`
 	Username      string `json:"username"`
 	Price         any    `json:"price"`

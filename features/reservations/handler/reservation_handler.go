@@ -61,7 +61,6 @@ func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 
 		reservationData.Date = input.Date
 		reservationData.PaymentStatus = input.PaymentStatus
-		reservationData.ReservationID = input.ReservationID
 		reservationData.RoomID = input.RoomID
 
 		res, err := rh.s.AddReservation(reservationData, c.Get("user").(*jwt.Token))

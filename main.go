@@ -54,7 +54,7 @@ func main() {
 	reservationService := ress.NewReservationService(reservationData, jwt)
 	reservationHandler := resh.NewReservationHandler(reservationService)
 
-	paymentData := pd.NewPaymentData(*mdClient)
+	paymentData := pd.NewPaymentData(*mdClient, client)
 	paymentService := ps.NewPaymentService(paymentData, jwt)
 	paymentHandler := ph.NewPaymentHandler(paymentService)
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"project/features/payments"
 	"project/helper"
 
@@ -19,8 +20,22 @@ func NewPaymentService(data payments.PaymentData, jwt helper.JWTInterface) *Paym
 	}
 }
 
-func (ps *PaymentService) CreatePayment(id string) (*snap.Response, error) {
-	res, err := ps.d.CreatePayment(id)
+func (ps *PaymentService) CreatePayment(reservationID string) (*snap.Response, error) {
+	reservation, err := ps.d.GetReservationInfo(reservationID)
+	if err != nil {
+		return nil, err
+	}
+
+	if reservation.Username == "" {
+		return nil, errors.New("No data")
+	}
+
+	email, err := ps.d.GetUserEmail(reservation.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ps.d.CreatePayment(reservationID, reservation.Username, email, int(reservation.Price.(float64)))
 	if err != nil {
 		return nil, err
 	}

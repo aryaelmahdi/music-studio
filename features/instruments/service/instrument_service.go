@@ -23,7 +23,7 @@ func NewInstrumentService(data instruments.InstrumentDataInterface, jwt helper.J
 func (is *InstrumentService) GetAllInstruments() (*instruments.InstrumentsMap, error) {
 	res, err := is.d.GetAllInstruments()
 	if err != nil {
-		return nil, errors.New("Cannot get Instruments data" + err.Error())
+		return nil, errors.New("no data")
 	}
 	return res, nil
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"project/features/payments"
 	"project/helper"
 
@@ -23,6 +24,10 @@ func (ps *PaymentService) CreatePayment(reservationID string) (*snap.Response, e
 	reservation, err := ps.d.GetReservationInfo(reservationID)
 	if err != nil {
 		return nil, err
+	}
+
+	if reservation.Username == "" {
+		return nil, errors.New("No data")
 	}
 
 	email, err := ps.d.GetUserEmail(reservation.Username)

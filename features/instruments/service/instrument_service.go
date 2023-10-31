@@ -33,8 +33,8 @@ func (is *InstrumentService) GetInstrumentByID(id string) (*instruments.Instrume
 	if err != nil {
 		return nil, errors.New("Cannot get Intrument data " + err.Error())
 	}
-	if res.IntrumentID == "" {
-		return nil, errors.New("No data found")
+	if res.Name == "" {
+
 	}
 	return res, nil
 }

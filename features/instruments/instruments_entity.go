@@ -6,10 +6,9 @@ import (
 )
 
 type Instruments struct {
-	IntrumentID string `json:"instrument_id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Year        int    `json:"year"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Year int    `json:"year"`
 }
 
 type RoomInstrument struct {

@@ -55,6 +55,7 @@ func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
 			}
 			c.Logger().Error("handler: delete process error:", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+fmt.Sprint(res)+" deleted", nil, http.StatusNoContent))

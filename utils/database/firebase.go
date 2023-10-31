@@ -7,11 +7,12 @@ import (
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
+	"firebase.google.com/go/messaging"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
 )
 
-func InitFirebaseApp(sdk string, projectID string, url string) (*firebase.App, *db.Client) {
+func InitFirebaseApp(sdk string, projectID string, url string) (*firebase.App, *db.Client, *messaging.Client) {
 	conf := &firebase.Config{
 		DatabaseURL: url,
 	}
@@ -28,6 +29,11 @@ func InitFirebaseApp(sdk string, projectID string, url string) (*firebase.App, *
 		log.Fatalln("Error initializing app:", err)
 	}
 
+	fcm, err := app.Messaging(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	client, err := app.DatabaseWithURL(context.Background(), url)
 	if err != nil {
 		logrus.Info("url :", url)
@@ -40,5 +46,5 @@ func InitFirebaseApp(sdk string, projectID string, url string) (*firebase.App, *
 		log.Fatalln("Error reading from database:", err)
 	}
 
-	return app, client
+	return app, client, fcm
 }

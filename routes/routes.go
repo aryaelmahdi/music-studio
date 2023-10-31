@@ -42,5 +42,5 @@ func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret 
 }
 
 func PaymentRoutes(e *echo.Echo, ph payments.PaymentHandler, secret string) {
-	e.GET("/payment/:id", ph.CreatePayment(), echojwt.JWT([]byte(secret)))
+	e.GET("/payment/:id", ph.CreatePayment())
 }

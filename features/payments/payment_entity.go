@@ -3,6 +3,7 @@ package payments
 import (
 	"project/features/reservations"
 
+	"firebase.google.com/go/messaging"
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go/snap"
 )
@@ -14,13 +15,16 @@ type Payment struct {
 }
 
 type PaymentData interface {
-	CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, error)
+	CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, string, error)
 	GetReservationInfo(reservationID string) (*reservations.Reservation, error)
 	GetUserEmail(username string) (string, error)
+	SendMessage(message *messaging.Message) error
+	SendEmail(smtpUser string, smtpPassword string, smtpServer string, smtpPort string, receiver []string, msg string) error
 }
-
 type PaymentService interface {
-	CreatePayment(reservationID string) (*snap.Response, error)
+	CreatePayment(reservationID string) (*snap.Response, string, error)
+	SendMessage(token string, paymentToken string, orderID string) error
+	SendEmail(recipientEmail string, orderID string, paymentToken string) error
 }
 
 type PaymentHandler interface {

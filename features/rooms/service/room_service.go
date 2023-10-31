@@ -62,6 +62,9 @@ func (rs *RoomService) GetAllRooms() (map[string]any, error) {
 	if err != nil {
 		return nil, errors.New("Cannot get rooms data")
 	}
+	if len(res) == 0 {
+		return nil, errors.New("no data found")
+	}
 	return res, nil
 }
 

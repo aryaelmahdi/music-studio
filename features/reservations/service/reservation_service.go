@@ -56,15 +56,26 @@ func (rs *ReservationService) AddReservation(newData reservations.Reservation, t
 	return res, nil
 }
 
-func (rs *ReservationService) UpdateReservation(newData reservations.Reservation, token *jwt.Token) (*reservations.Reservation, error) {
+func (rs *ReservationService) UpdateReservation(id string, newData reservations.Reservation, token *jwt.Token) (*reservations.Reservation, error) {
+	dateErr := helper.VerifyCancelDate(newData.Date)
+	if dateErr != nil {
+		return nil, dateErr
+	}
+
 	username, _ := rs.j.ExtractToken(token)
 	newData.Username = fmt.Sprint(username)
+	newData.ReservationID = id
 	dataMap, err := helper.ToMap(newData)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := rs.d.UpdateReservation(dataMap)
+	roomExists, room, err := rs.d.IsRoomValid(id)
+	if roomExists {
+		newData.Price = room["price"]
+	}
+
+	res, err := rs.d.UpdateReservation(newData.ReservationID, dataMap)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func NewInstrumentService(data instruments.InstrumentDataInterface, jwt helper.J
 func (is *InstrumentService) GetAllInstruments() (*instruments.InstrumentsMap, error) {
 	res, err := is.d.GetAllInstruments()
 	if err != nil {
-		return nil, errors.New("Cannot get Instruments data" + err.Error())
+		return nil, errors.New("no data")
 	}
 	return res, nil
 }
@@ -33,6 +33,9 @@ func (is *InstrumentService) GetInstrumentByID(id string) (*instruments.Instrume
 	if err != nil {
 		return nil, errors.New("Cannot get Intrument data " + err.Error())
 	}
+	if res.Name == "" {
+
+	}
 	return res, nil
 }
 
@@ -40,6 +43,12 @@ func (is *InstrumentService) AddInstrument(newData instruments.Instruments, toke
 	_, role := is.j.ExtractToken(token)
 	if role != "admin" {
 		return nil, errors.New("Unauthorized user")
+	}
+	if newData.Name == "" && newData.Type == "" && newData.Year < 1750 {
+		return nil, errors.New("Invalid input data")
+	}
+	if newData.Type != "guitar" && newData.Type != "drum" && newData.Type != "bass" && newData.Type != "keyboard" {
+		return nil, errors.New("Invalid instrument type")
 	}
 	res, err := is.d.AddInstrument(newData)
 	if err != nil {
@@ -53,6 +62,11 @@ func (is *InstrumentService) DeleteInstrument(id string, token *jwt.Token) error
 	if role != "admin" {
 		return errors.New("Unauthorized user")
 	}
+
+	if exists := is.d.IsInstrumentExist(id); !exists {
+		return errors.New("invalid id")
+	}
+
 	err := is.d.DeleteInstrument(id)
 	if err != nil {
 		return errors.New("Cannot delete instrument " + err.Error())
@@ -64,6 +78,15 @@ func (is *InstrumentService) UpdateInstrument(id string, newData instruments.Ins
 	_, role := is.j.ExtractToken(token)
 	if role != "admin" {
 		return nil, errors.New("Unauthorized user")
+	}
+	if newData.Name == "" && newData.Type == "" && newData.Year < 1750 {
+		return nil, errors.New("Invalid input data")
+	}
+	if newData.Type != "guitar" && newData.Type != "drum" && newData.Type != "bass" && newData.Type != "keyboard" {
+		return nil, errors.New("Invalid instrument type")
+	}
+	if exists := is.d.IsInstrumentExist(id); !exists {
+		return nil, errors.New("Invalid id")
 	}
 	res, err := is.d.UpdateInstrument(id, newData)
 	if err != nil {

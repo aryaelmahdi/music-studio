@@ -61,7 +61,6 @@ func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 
 		reservationData.Date = input.Date
 		reservationData.PaymentStatus = input.PaymentStatus
-		reservationData.ReservationID = input.ReservationID
 		reservationData.RoomID = input.RoomID
 
 		res, err := rh.s.AddReservation(reservationData, c.Get("user").(*jwt.Token))
@@ -75,6 +74,7 @@ func (rh *ReservationHandler) AddReservation() echo.HandlerFunc {
 
 func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		id := c.Param("id")
 		var input reservations.Reservation
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler : binding process error ", err.Error())
@@ -85,7 +85,7 @@ func (rh *ReservationHandler) UpdateReservation() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+dateError.Error(), nil, http.StatusBadRequest))
 		}
 
-		res, err := rh.s.UpdateReservation(input, c.Get("user").(*jwt.Token))
+		res, err := rh.s.UpdateReservation(id, input, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("handler : error updating data ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))

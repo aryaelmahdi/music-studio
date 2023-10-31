@@ -37,7 +37,7 @@ func (id *InstrumentData) GetInstrumentByID(instrumentID string) (*instruments.I
 }
 
 func (id *InstrumentData) AddInstrument(newData instruments.Instruments) (*instruments.Instruments, error) {
-	ref := id.db.NewRef("instruments").Child(newData.IntrumentID)
+	ref := id.db.NewRef("instruments").Child(newData.Name)
 	if err := ref.Set(context.Background(), &newData); err != nil {
 		return nil, err
 	}
@@ -63,4 +63,14 @@ func (id *InstrumentData) DeleteInstrument(instrumentID string) error {
 		return err
 	}
 	return nil
+}
+
+func (id *InstrumentData) IsInstrumentExist(instrumentName string) bool {
+	ref := id.db.NewRef("instruments").Child(instrumentName)
+	var data instruments.Instruments
+	ref.Get(context.Background(), &data)
+	if data.Name == "" {
+		return false
+	}
+	return true
 }

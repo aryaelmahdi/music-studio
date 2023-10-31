@@ -27,7 +27,7 @@ func (rd *ReservationData) AddReservation(resData reservations.Reservation) (*re
 		return nil, errors.New("room reserved")
 	}
 
-	roomValid, room, err := rd.isRoomValid(resData.RoomID)
+	roomValid, room, err := rd.IsRoomValid(resData.RoomID)
 	if !roomValid || err != nil {
 		return nil, errors.New("room does not exist")
 	}
@@ -38,7 +38,7 @@ func (rd *ReservationData) AddReservation(resData reservations.Reservation) (*re
 	}
 	resData.Price = price
 
-	ref := rd.db.NewRef("reservations").Child(resData.RoomID)
+	ref := rd.db.NewRef("reservations").Child(resData.Date + resData.RoomID)
 	if err := ref.Set(context.Background(), resData); err != nil {
 		return nil, err
 	}
@@ -55,8 +55,8 @@ func (rd *ReservationData) GetAllReservations() (*reservations.AllReservations, 
 	return &res, nil
 }
 
-func (rd *ReservationData) UpdateReservation(newData map[string]interface{}) (*reservations.Reservation, error) {
-	isValid, room, err := rd.isRoomValid(newData["room_id"].(string))
+func (rd *ReservationData) UpdateReservation(reservationID string, newData map[string]interface{}) (*reservations.Reservation, error) {
+	isValid, room, err := rd.IsRoomValid(newData["room_id"].(string))
 	if !isValid || err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (rd *ReservationData) UpdateReservation(newData map[string]interface{}) (*r
 		return nil, errors.New("room reserved")
 	}
 
-	ref := rd.db.NewRef("reservations").Child(newData["reservation_id"].(string))
+	ref := rd.db.NewRef("reservations").Child(reservationID)
 	var res reservations.Reservation
 
 	if err := ref.Update(context.Background(), newData); err != nil {
@@ -113,7 +113,17 @@ func (rd *ReservationData) GetReservationByID(id string) (*reservations.Reservat
 	return &reservation, nil
 }
 
-func (rd *ReservationData) isRoomValid(roomID string) (bool, map[string]any, error) {
+func (rd *ReservationData) IsIDValid(id string) bool {
+	ref := rd.db.NewRef("reservations").Child(id)
+	var data reservations.Reservation
+	ref.Get(context.Background(), &data)
+	if data.ReservationID == "" {
+		return false
+	}
+	return true
+}
+
+func (rd *ReservationData) IsRoomValid(roomID string) (bool, map[string]any, error) {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any
 	if err := ref.Get(context.Background(), &room); err != nil {

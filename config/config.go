@@ -17,7 +17,15 @@ type Config struct {
 	MDClientKey string
 }
 
-func InitConfig() *Config {
+type SMTP struct {
+	EmailHost     string
+	EmailPort     string
+	EmailUsername string
+	EmailPassword string
+	From          string
+}
+
+func InitConfig() (*Config, *SMTP) {
 	_, err := os.Stat(".env")
 	if err == nil {
 		err := godotenv.Load()
@@ -27,16 +35,17 @@ func InitConfig() *Config {
 	}
 
 	res := new(Config)
-	res = loadConfig()
+	res, smtpRes := loadConfig()
 	if res == nil {
 		logrus.Fatal("Cannot load configuration")
-		return nil
+		return nil, nil
 	}
-	return res
+	return res, smtpRes
 }
 
-func loadConfig() *Config {
+func loadConfig() (*Config, *SMTP) {
 	res := new(Config)
+	smtpRes := new(SMTP)
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.SECRET = val
 	}
@@ -70,5 +79,21 @@ func loadConfig() *Config {
 		}
 	}
 
-	return res
+	if val, found := os.LookupEnv("EMAIL_HOST"); found {
+		smtpRes.EmailHost = val
+	}
+	if val, found := os.LookupEnv("EMAIL_PORT"); found {
+		smtpRes.EmailPort = val
+	}
+	if val, found := os.LookupEnv("EMAIL_USERNAME"); found {
+		smtpRes.EmailUsername = val
+	}
+	if val, found := os.LookupEnv("EMAIL_PASSWORD"); found {
+		smtpRes.EmailPassword = val
+	}
+	if val, found := os.LookupEnv("FROM"); found {
+		smtpRes.From = val
+	}
+
+	return res, smtpRes
 }

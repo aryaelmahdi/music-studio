@@ -31,7 +31,7 @@ type RoomService interface {
 	DeleteRoom(roomID string, token *jwt.Token) (any, error)
 	GetAllRooms() (map[string]any, error)
 	GetRoomByID(roomID string) (*Rooms, error)
-	UpdateRoom(roomID string, updatedRoom Rooms) (*Rooms, error)
+	UpdateRoom(roomID string, updatedRoom Rooms, token *jwt.Token) (*Rooms, error)
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
 	FilterRoomByPrice(price int, page int, pageSize int) (map[string]any, error)
 }

@@ -114,7 +114,7 @@ func (rh *RoomHandler) UpdateRoom() echo.HandlerFunc {
 		}
 
 		input.RoomID = roomID
-		res, err := rh.s.UpdateRoom(roomID, input)
+		res, err := rh.s.UpdateRoom(roomID, input, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("handler: update process error:", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))

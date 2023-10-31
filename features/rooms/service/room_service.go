@@ -79,7 +79,14 @@ func (rs *RoomService) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 	return res, nil
 }
 
-func (rs *RoomService) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.Rooms, error) {
+func (rs *RoomService) UpdateRoom(roomID string, updatedRoom rooms.Rooms, token *jwt.Token) (*rooms.Rooms, error) {
+	_, role := rs.j.ExtractToken(token)
+	if role != "admin" {
+		return nil, errors.New("Unauthorized user")
+	}
+	if roomsExists := rs.d.IsRoomExist(roomID); !roomsExists {
+		return nil, errors.New("invalid id")
+	}
 	res, err := rs.d.UpdateRoom(roomID, updatedRoom)
 	if err != nil {
 		return nil, errors.New("Cannot update room")

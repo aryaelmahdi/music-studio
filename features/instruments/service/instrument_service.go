@@ -85,6 +85,9 @@ func (is *InstrumentService) UpdateInstrument(id string, newData instruments.Ins
 	if newData.Type != "guitar" && newData.Type != "drum" && newData.Type != "bass" && newData.Type != "keyboard" {
 		return nil, errors.New("Invalid instrument type")
 	}
+	if exists := is.d.IsInstrumentExist(id); !exists {
+		return nil, errors.New("Invalid id")
+	}
 	res, err := is.d.UpdateInstrument(id, newData)
 	if err != nil {
 		return nil, errors.New("Cannot update instrument" + err.Error())

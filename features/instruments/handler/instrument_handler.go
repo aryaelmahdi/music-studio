@@ -64,7 +64,7 @@ func (ih *InstrumentHandler) DeleteInstrument() echo.HandlerFunc {
 		id := c.Param("id")
 		if err := ih.s.DeleteInstrument(id, c.Get("user").(*jwt.Token)); err != nil {
 			c.Logger().Error("handler : cannot delete instrument :" + err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusNoContent, helper.FormatResponse("success", nil, http.StatusNoContent))
 	}

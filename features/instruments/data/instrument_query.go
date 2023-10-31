@@ -64,3 +64,13 @@ func (id *InstrumentData) DeleteInstrument(instrumentID string) error {
 	}
 	return nil
 }
+
+func (id *InstrumentData) IsInstrumentExist(instrumentName string) bool {
+	ref := id.db.NewRef("instruments").Child(instrumentName)
+	var data instruments.Instruments
+	ref.Get(context.Background(), &data)
+	if data.Name == "" {
+		return false
+	}
+	return true
+}

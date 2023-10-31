@@ -62,6 +62,11 @@ func (is *InstrumentService) DeleteInstrument(id string, token *jwt.Token) error
 	if role != "admin" {
 		return errors.New("Unauthorized user")
 	}
+
+	if exists := is.d.IsInstrumentExist(id); !exists {
+		return errors.New("invalid id")
+	}
+
 	err := is.d.DeleteInstrument(id)
 	if err != nil {
 		return errors.New("Cannot delete instrument " + err.Error())

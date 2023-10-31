@@ -26,6 +26,7 @@ type InstrumentDataInterface interface {
 	AddInstrument(newData Instruments) (*Instruments, error)
 	DeleteInstrument(id string) error
 	UpdateInstrument(id string, newData Instruments) (*Instruments, error)
+	IsInstrumentExist(instrumentName string) bool
 }
 
 type InstrumentService interface {

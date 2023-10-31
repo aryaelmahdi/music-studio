@@ -79,6 +79,12 @@ func (is *InstrumentService) UpdateInstrument(id string, newData instruments.Ins
 	if role != "admin" {
 		return nil, errors.New("Unauthorized user")
 	}
+	if newData.Name == "" && newData.Type == "" && newData.Year < 1750 {
+		return nil, errors.New("Invalid input data")
+	}
+	if newData.Type != "guitar" && newData.Type != "drum" && newData.Type != "bass" && newData.Type != "keyboard" {
+		return nil, errors.New("Invalid instrument type")
+	}
 	res, err := is.d.UpdateInstrument(id, newData)
 	if err != nil {
 		return nil, errors.New("Cannot update instrument" + err.Error())

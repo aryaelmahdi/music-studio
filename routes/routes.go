@@ -37,7 +37,7 @@ func ReservationRoutes(e *echo.Echo, rh reservations.ReservationHandler, secret 
 	e.POST("/reservations", rh.AddReservation(), echojwt.JWT([]byte(secret)))
 	e.GET("/reservations", rh.GetAllReservations(), echojwt.JWT([]byte(secret)))
 	e.GET("/myreservations", rh.GetReservationsByUsername(), echojwt.JWT([]byte(secret)))
-	e.PUT("/reservations", rh.UpdateReservation(), echojwt.JWT([]byte(secret)))
+	e.PUT("/reservations/:id", rh.UpdateReservation(), echojwt.JWT([]byte(secret)))
 	e.DELETE("/reservations/:id", rh.DeleteReservation(), echojwt.JWT([]byte(secret)))
 }
 

@@ -63,7 +63,7 @@ func (uh *UserHandler) Login() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "not found") {
 				return c.JSON(http.StatusNotFound, helper.FormatResponse("fail", nil, http.StatusNotFound))
 			}
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail", nil, http.StatusInternalServerError))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 
 		var res = new(LoginResponse)

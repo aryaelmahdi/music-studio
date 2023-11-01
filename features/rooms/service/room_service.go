@@ -200,6 +200,6 @@ func (rs *RoomService) GetRecommendation(genre1 string, genre2 string) (any, err
 		return nil, errors.New("something went wrong")
 	}
 
-	cleanRes, _ := strconv.Unquote(`"` + res + `"`)
-	return cleanRes, nil
+	//cleanRes, _ := strconv.Unquote(`"` + res + `"`)
+	return res, nil
 }

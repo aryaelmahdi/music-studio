@@ -54,3 +54,22 @@ func PaginateMap(data map[string]any, page int, pageSize int) map[string]any {
 
 	return result
 }
+
+func Paginate(data []map[string]interface{}, page int, pageSize int) ([]map[string]interface{}, error) {
+	if page <= 0 || pageSize <= 0 {
+		return nil, errors.New("Invalid page or pageSize")
+	}
+
+	start := (page - 1) * pageSize
+	end := start + pageSize
+
+	if start >= len(data) {
+		return nil, errors.New("Page not found")
+	}
+
+	if end > len(data) {
+		end = len(data)
+	}
+
+	return data[start:end], nil
+}

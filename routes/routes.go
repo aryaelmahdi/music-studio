@@ -23,6 +23,8 @@ func RoomRoutes(e *echo.Echo, rh rooms.RoomHandler, secret string) {
 	e.DELETE("/rooms/:id", rh.DeleteRoom(), echojwt.JWT([]byte(secret)))
 	e.PUT("/rooms/:id", rh.UpdateRoom(), echojwt.JWT([]byte(secret)))
 	e.POST("/rooms/:id", rh.AddRoomInstrument(), echojwt.JWT([]byte(secret)))
+	e.GET("/rooms/reserved", rh.GetBookedRooms())
+	e.POST("/rooms/recommendation", rh.GetRecommendation())
 }
 
 func InstrumentsRoutes(e *echo.Echo, ih instruments.InstrumentHandler, secret string) {

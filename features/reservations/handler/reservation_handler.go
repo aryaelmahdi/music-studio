@@ -40,7 +40,7 @@ func (rh *ReservationHandler) GetReservationsByUsername() echo.HandlerFunc {
 		res, err := rh.s.GetReservationsByUsername(c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("Handler: cannot get reservation by username", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

@@ -55,6 +55,7 @@ func (rh *RoomHandler) DeleteRoom() echo.HandlerFunc {
 				return c.JSON(http.StatusUnauthorized, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusUnauthorized))
 			}
 			c.Logger().Error("handler: delete process error:", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		return c.JSON(http.StatusNoContent, helper.FormatResponse("room :"+fmt.Sprint(res)+" deleted", nil, http.StatusNoContent))
@@ -73,7 +74,7 @@ func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 			pageSize = 5
 		}
 		if queryPrice == "" {
-			res, err := rh.s.GetAllRooms()
+			res, err := rh.s.GetAllRooms(page, pageSize)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
 			}
@@ -113,7 +114,7 @@ func (rh *RoomHandler) UpdateRoom() echo.HandlerFunc {
 		}
 
 		input.RoomID = roomID
-		res, err := rh.s.UpdateRoom(roomID, input)
+		res, err := rh.s.UpdateRoom(roomID, input, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("handler: update process error:", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
@@ -137,5 +138,40 @@ func (rh *RoomHandler) AddRoomInstrument() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
+	}
+}
+
+func (rh *RoomHandler) GetBookedRooms() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 1
+		}
+		pageSize, err := strconv.Atoi(c.QueryParam("page_size"))
+		if err != nil {
+			pageSize = 100
+		}
+		res, err := rh.s.GetBookedRooms(page, pageSize)
+		if err != nil {
+			c.Logger().Error("handler : cannot get booked rooms, " + err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}
+
+func (rh *RoomHandler) GetRecommendation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var recommendation rooms.Recommendation
+		if err := c.Bind(&recommendation); err != nil {
+			c.Logger().Error("Handler : binding data error")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.GetRecommendation(recommendation.Genre1, recommendation.Genre2)
+		if err != nil {
+			c.Logger().Error("Handler : recomendation process error")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}
 }

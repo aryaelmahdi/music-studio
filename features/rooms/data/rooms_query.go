@@ -4,26 +4,30 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
 
 	"firebase.google.com/go/db"
+	"github.com/sashabaranov/go-openai"
 )
 
 type RoomData struct {
-	db *db.Client
+	db     *db.Client
+	openai *openai.Client
 }
 
-func NewRoomData(client *db.Client) rooms.RoomDataInterface {
+func NewRoomData(client *db.Client, openai *openai.Client) rooms.RoomDataInterface {
 	return &RoomData{
-		db: client,
+		db:     client,
+		openai: openai,
 	}
 }
 
-func (rd *RoomData) GetAllRooms() (map[string]any, error) {
+func (rd *RoomData) GetAllRooms() (map[string]map[string]interface{}, error) {
 	ref := rd.db.NewRef("rooms")
-	rooms := make(map[string]any)
+	rooms := map[string]map[string]interface{}{}
 	if err := ref.Get(context.Background(), &rooms); err != nil {
 		return nil, err
 	}
@@ -40,7 +44,7 @@ func (rd *RoomData) GetRoomByID(roomID string) (*rooms.Rooms, error) {
 }
 
 func (rd *RoomData) AddRoom(newRoom rooms.Rooms) (*rooms.Rooms, error) {
-	if roomExists := rd.isRoomExist(newRoom.RoomID); roomExists {
+	if roomExists := rd.IsRoomExist(newRoom.RoomID); roomExists {
 		return nil, errors.New("room already exists")
 	}
 	ref := rd.db.NewRef("rooms").Child(newRoom.RoomID)
@@ -71,8 +75,8 @@ func (rd *RoomData) UpdateRoom(roomID string, updatedRoom rooms.Rooms) (*rooms.R
 	return &updatedRoom, nil
 }
 
-func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
-	rooms := make(map[string]any)
+func (rd *RoomData) FilterRoomByPrice(price int) (map[string]map[string]interface{}, error) {
+	rooms := map[string]map[string]interface{}{}
 	ref := rd.db.NewRef("rooms")
 	if err := ref.OrderByChild("price").EndAt(price).Get(context.Background(), &rooms); err != nil {
 		return nil, err
@@ -80,7 +84,18 @@ func (rd *RoomData) FilterRoomByPrice(price int) (map[string]any, error) {
 	return rooms, nil
 }
 
-func (rd *RoomData) isRoomExist(roomID string) bool {
+func (rd *RoomData) GetBookedRooms() (map[string]map[string]interface{}, error) {
+	reserved := map[string]map[string]interface{}{}
+	ref := rd.db.NewRef("reservations")
+	err := ref.Get(context.Background(), &reserved)
+	if err != nil {
+		log.Fatalf("Error reading data: %v", err)
+		return nil, err
+	}
+	return reserved, nil
+}
+
+func (rd *RoomData) IsRoomExist(roomID string) bool {
 	ref := rd.db.NewRef("rooms").Child(roomID)
 	var room map[string]any
 	ref.Get(context.Background(), &room)
@@ -135,4 +150,22 @@ func (rd *RoomData) isInstrumentExists(instrumentName string) bool {
 		return false
 	}
 	return true
+}
+
+func (rd *RoomData) GetRecommendation(genre1 string, genre2 string, message string) (string, error) {
+	str := "\\ruangB\\"
+	res, err := rd.openai.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+		Model: openai.GPT3Dot5Turbo,
+		Messages: []openai.ChatCompletionMessage{
+			{Role: openai.ChatMessageRoleSystem, Content: "you're here to help people choose their rooms from your recommendations based on data given. for the room names, don't include the / into your response, don't need to make a new line, don't need to include double escape or if you find something like this : " + str + ", remove the backslash, just straight up room names and its instruments like 'ruangH - fender stratocaster. reasons....' in a single paragraph"},
+			{Role: openai.ChatMessageRoleUser, Content: message},
+		},
+	})
+
+	if err != nil {
+		fmt.Println("data error")
+		return "", fmt.Errorf("ChatCompletion error: %v\n", err)
+	}
+
+	return res.Choices[0].Message.Content, nil
 }

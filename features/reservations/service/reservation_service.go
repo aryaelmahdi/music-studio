@@ -40,6 +40,9 @@ func (rs *ReservationService) GetReservationsByUsername(token *jwt.Token) (map[s
 	if err != nil {
 		return nil, err
 	}
+	if len(res) == 0 {
+		return nil, errors.New("no data found")
+	}
 	return res, nil
 }
 

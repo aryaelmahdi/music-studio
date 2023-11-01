@@ -181,7 +181,7 @@ func (rs *RoomService) GetRecommendation(genre1 string, genre2 string) (any, err
 		return nil, errors.New("no data found")
 	}
 	if genre1 == "" && genre2 == "" {
-		return roomData, nil
+		return nil, errors.New("no data provided")
 	}
 
 	jsonData, err := json.Marshal(roomData)

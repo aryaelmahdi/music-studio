@@ -15,6 +15,7 @@ type Config struct {
 	DatabaseURL string
 	MDServerKey string
 	MDClientKey string
+	OpenAPIKey  string
 }
 
 type SMTP struct {
@@ -63,6 +64,9 @@ func loadConfig() (*Config, *SMTP) {
 	}
 	if val, found := os.LookupEnv("MidtransSandBoxClientKey"); found {
 		res.MDClientKey = val
+	}
+	if val, found := os.LookupEnv("OPENAPI_KEY"); found {
+		res.OpenAPIKey = val
 	}
 	if val, found := os.LookupEnv("GOOCREDS"); found {
 		jsonBytes := []byte(val)

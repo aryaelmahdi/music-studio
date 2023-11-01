@@ -10,15 +10,18 @@ import (
 	"project/helper"
 
 	"firebase.google.com/go/db"
+	"github.com/sashabaranov/go-openai"
 )
 
 type RoomData struct {
-	db *db.Client
+	db     *db.Client
+	openai *openai.Client
 }
 
-func NewRoomData(client *db.Client) rooms.RoomDataInterface {
+func NewRoomData(client *db.Client, openai *openai.Client) rooms.RoomDataInterface {
 	return &RoomData{
-		db: client,
+		db:     client,
+		openai: openai,
 	}
 }
 
@@ -147,4 +150,22 @@ func (rd *RoomData) isInstrumentExists(instrumentName string) bool {
 		return false
 	}
 	return true
+}
+
+func (rd *RoomData) GetRecommendation(genre1 string, genre2 string, message string) (string, error) {
+	str := "\\ruangB\\"
+	res, err := rd.openai.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+		Model: openai.GPT3Dot5Turbo,
+		Messages: []openai.ChatCompletionMessage{
+			{Role: openai.ChatMessageRoleSystem, Content: "you're here to help people choose their rooms from your recommendations based on data given. for the room names, don't include the / into your response, don't need to make a new line, don't need to include double escape or if you find something like this : " + str + ", remove the backslash, just straight up room names and its instruments like 'ruangH - fender stratocaster. reasons....' in a single paragraph"},
+			{Role: openai.ChatMessageRoleUser, Content: message},
+		},
+	})
+
+	if err != nil {
+		fmt.Println("data error")
+		return "", fmt.Errorf("ChatCompletion error: %v\n", err)
+	}
+
+	return res.Choices[0].Message.Content, nil
 }

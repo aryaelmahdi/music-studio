@@ -159,3 +159,19 @@ func (rh *RoomHandler) GetBookedRooms() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}
 }
+
+func (rh *RoomHandler) GetRecommendation() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var recommendation rooms.Recommendation
+		if err := c.Bind(&recommendation); err != nil {
+			c.Logger().Error("Handler : binding data error")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		res, err := rh.s.GetRecommendation(recommendation.Genre1, recommendation.Genre2)
+		if err != nil {
+			c.Logger().Error("Handler : recomendation process error")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
+	}
+}

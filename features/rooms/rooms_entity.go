@@ -15,6 +15,11 @@ type Rooms struct {
 
 type RoomMap map[string]interface{}
 
+type Recommendation struct {
+	Genre1 string `json:"genre1"`
+	Genre2 string `json:"genre2"`
+}
+
 type RoomDataInterface interface {
 	AddRoom(newRoom Rooms) (*Rooms, error)
 	DeleteRoom(roomID string) error
@@ -25,6 +30,7 @@ type RoomDataInterface interface {
 	FilterRoomByPrice(price int) (map[string]map[string]interface{}, error)
 	IsRoomExist(roomID string) bool
 	GetBookedRooms() (map[string]map[string]interface{}, error)
+	GetRecommendation(genre1 string, genre2 string, message string) (string, error)
 }
 
 type RoomService interface {
@@ -36,6 +42,7 @@ type RoomService interface {
 	AddRoomInstrument(roomId string, instrumentData instruments.RoomInstrument, token *jwt.Token) (any, error)
 	FilterRoomByPrice(price int, page int, pageSize int) ([]map[string]any, error)
 	GetBookedRooms(page int, pageSize int) ([]map[string]any, error)
+	GetRecommendation(genre1 string, genre2 string) (any, error)
 }
 
 type RoomHandler interface {
@@ -46,4 +53,5 @@ type RoomHandler interface {
 	UpdateRoom() echo.HandlerFunc
 	AddRoomInstrument() echo.HandlerFunc
 	GetBookedRooms() echo.HandlerFunc
+	GetRecommendation() echo.HandlerFunc
 }

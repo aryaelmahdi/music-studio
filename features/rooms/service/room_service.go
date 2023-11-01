@@ -1,10 +1,13 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -167,4 +170,33 @@ func (rs *RoomService) GetBookedRooms(page int, pageSize int) ([]map[string]any,
 		return nil, err
 	}
 	return res, nil
+}
+
+func (rs *RoomService) GetRecommendation(genre1 string, genre2 string) (any, error) {
+	roomData, err := rs.d.GetAllRooms()
+	if err != nil {
+		return nil, errors.New("Cannot get rooms data")
+	}
+	if len(roomData) == 0 {
+		return nil, errors.New("no data found")
+	}
+	if genre1 == "" && genre2 == "" {
+		return roomData, nil
+	}
+
+	jsonData, err := json.Marshal(roomData)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil, err
+	}
+	dataString := string(jsonData)
+	str := "\\ruangB - fender stratocaster\\"
+	message := fmt.Sprint("i want to play " + genre1 + " and " + genre2 + " in a studio, these are the rooms data the gave me : " + dataString + ". \n based on the instruments on each rooms, which one is suitable for my purpose?  for the room names, don't include the / into your response, don't need to make a new line, don't need to include backslash to point out the data, slash or any symbols, just straight up room names and its instruments like 'ruangH - fender stratocaster. reasons....' in a single paragraph, not like " + str)
+	res, err := rs.d.GetRecommendation(genre1, genre2, message)
+	if err != nil {
+		return nil, err
+	}
+
+	cleanRes, _ := strconv.Unquote(`"` + res + `"`)
+	return cleanRes, nil
 }

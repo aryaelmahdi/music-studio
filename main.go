@@ -19,6 +19,7 @@ import (
 	us "project/features/users/service"
 	"project/helper"
 	"project/routes"
+	"project/utils/api"
 	"project/utils/database"
 
 	"github.com/labstack/echo/v4"
@@ -29,6 +30,7 @@ func main() {
 	e := echo.New()
 	cfg, smtp := config.InitConfig()
 	mdClient := config.MidtransConfig(cfg.MDServerKey)
+	openAIClient := api.InitAPI(cfg.OpenAPIKey)
 
 	db, client, fcm := database.InitFirebaseApp(cfg.SDKPath, cfg.ProjectID, cfg.DatabaseURL)
 	if db == nil {
@@ -42,7 +44,7 @@ func main() {
 	userServices := us.NewUserService(userData, generator, jwt)
 	userHandler := uh.NewUserHandler(userServices)
 
-	roomData := rd.NewRoomData(client)
+	roomData := rd.NewRoomData(client, openAIClient)
 	roomServices := rs.NewRoomService(roomData, jwt)
 	roomHandler := rh.NewRoomHandler(roomServices)
 

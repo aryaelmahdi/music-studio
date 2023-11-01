@@ -22,9 +22,9 @@ func NewRoomData(client *db.Client) rooms.RoomDataInterface {
 	}
 }
 
-func (rd *RoomData) GetAllRooms() (map[string]any, error) {
+func (rd *RoomData) GetAllRooms() (map[string]map[string]interface{}, error) {
 	ref := rd.db.NewRef("rooms")
-	rooms := make(map[string]any)
+	rooms := map[string]map[string]interface{}{}
 	if err := ref.Get(context.Background(), &rooms); err != nil {
 		return nil, err
 	}

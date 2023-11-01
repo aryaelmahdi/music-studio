@@ -74,7 +74,7 @@ func (rh *RoomHandler) GetAllRooms() echo.HandlerFunc {
 			pageSize = 5
 		}
 		if queryPrice == "" {
-			res, err := rh.s.GetAllRooms()
+			res, err := rh.s.GetAllRooms(page, pageSize)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("fail,"+err.Error(), nil, http.StatusInternalServerError))
 			}

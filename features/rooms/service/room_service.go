@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
@@ -56,8 +55,7 @@ func (rs *RoomService) DeleteRoom(roomID string, token *jwt.Token) (any, error) 
 	return roomID, nil
 }
 
-func (rs *RoomService) GetAllRooms() (map[string]any, error) {
-	fmt.Println("masuk all")
+func (rs *RoomService) GetAllRooms(page int, pageSize int) ([]map[string]any, error) {
 	res, err := rs.d.GetAllRooms()
 	if err != nil {
 		return nil, errors.New("Cannot get rooms data")
@@ -65,7 +63,19 @@ func (rs *RoomService) GetAllRooms() (map[string]any, error) {
 	if len(res) == 0 {
 		return nil, errors.New("no data found")
 	}
-	return res, nil
+	dataSlices := make([]map[string]any, 0)
+
+	for _, data := range res {
+		if _, exists := data["room_id"]; exists {
+			dataSlices = append(dataSlices, data)
+		}
+	}
+
+	paginatedRes, err := helper.Paginate(dataSlices, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return paginatedRes, nil
 }
 
 func (rs *RoomService) GetRoomByID(roomID string) (*rooms.Rooms, error) {

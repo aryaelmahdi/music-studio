@@ -7,6 +7,7 @@ import (
 	"project/features/instruments"
 	"project/features/rooms"
 	"project/helper"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -199,6 +200,9 @@ func (rs *RoomService) GetRecommendation(genre1 string, genre2 string) (any, err
 		return nil, errors.New("something went wrong")
 	}
 
-	//cleanRes, _ := strconv.Unquote(`"` + res + `"`)
-	return res, nil
+	cleanRes, err := strconv.Unquote(`"` + res + `"`)
+	if err != nil {
+		return res, nil
+	}
+	return cleanRes, nil
 }

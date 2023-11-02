@@ -19,7 +19,7 @@ func NewHelperDate(t *testing.T) *helperMock.HelperDate {
 	return mock
 }
 
-func TestRoomService_GetAllReservation(t *testing.T) {
+func TestReservationService_GetAllReservation(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	service := NewReservationService(data, jwtt)
@@ -38,7 +38,7 @@ func TestRoomService_GetAllReservation(t *testing.T) {
 	})
 	data.AssertExpectations(t)
 }
-func TestRoomService_GetReservationByUsername(t *testing.T) {
+func TestReservationService_GetReservationByUsername(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	service := NewReservationService(data, jwtt)
@@ -58,7 +58,7 @@ func TestRoomService_GetReservationByUsername(t *testing.T) {
 	})
 	data.AssertExpectations(t)
 }
-func TestRoomService_AddReservation(t *testing.T) {
+func TestReservationService_AddReservation(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	service := NewReservationService(data, jwtt)
@@ -79,7 +79,7 @@ func TestRoomService_AddReservation(t *testing.T) {
 	data.AssertExpectations(t)
 }
 
-func TestRoomService_UpdateReservation(t *testing.T) {
+func TestReservationService_UpdateReservation(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	date := NewHelperDate(t)
@@ -104,7 +104,7 @@ func TestRoomService_UpdateReservation(t *testing.T) {
 	data.AssertExpectations(t)
 }
 
-func TestRoomService_DeleteReservation(t *testing.T) {
+func TestReservationService_DeleteReservation(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	service := NewReservationService(data, jwtt)
@@ -125,7 +125,7 @@ func TestRoomService_DeleteReservation(t *testing.T) {
 	})
 	data.AssertExpectations(t)
 }
-func TestRoomService_GetReservationByID(t *testing.T) {
+func TestReservationService_GetReservationByID(t *testing.T) {
 	jwtt := helperMock.NewJWTInterface(t)
 	data := mocks.NewReservationData(t)
 	service := NewReservationService(data, jwtt)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"project/features/instruments"
 	"project/helper"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -21,7 +22,15 @@ func NewInstrumentHandler(service instruments.InstrumentService) instruments.Ins
 
 func (ih *InstrumentHandler) GetAllInstruments() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		res, err := ih.s.GetAllInstruments()
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 1
+		}
+		pageSize, err := strconv.Atoi(c.QueryParam("page_size"))
+		if err != nil {
+			page = 100
+		}
+		res, err := ih.s.GetAllInstruments(page, pageSize)
 		if err != nil {
 			c.Logger().Error("handler : cannot get instruments data :" + err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))

@@ -21,7 +21,7 @@ type RoomInstrument struct {
 type InstrumentsMap map[string]interface{}
 
 type InstrumentDataInterface interface {
-	GetAllInstruments() (*InstrumentsMap, error)
+	GetAllInstruments() (map[string]map[string]interface{}, error)
 	GetInstrumentByID(id string) (*Instruments, error)
 	AddInstrument(newData Instruments) (*Instruments, error)
 	DeleteInstrument(id string) error
@@ -30,7 +30,7 @@ type InstrumentDataInterface interface {
 }
 
 type InstrumentService interface {
-	GetAllInstruments() (*InstrumentsMap, error)
+	GetAllInstruments(page int, pageSize int) ([]map[string]any, error)
 	GetInstrumentByID(id string) (*Instruments, error)
 	AddInstrument(newData Instruments, token *jwt.Token) (*Instruments, error)
 	DeleteInstrument(id string, token *jwt.Token) error

@@ -18,13 +18,13 @@ func NewInstrumentData(client *db.Client) instruments.InstrumentDataInterface {
 	}
 }
 
-func (id *InstrumentData) GetAllInstruments() (*instruments.InstrumentsMap, error) {
+func (id *InstrumentData) GetAllInstruments() (map[string]map[string]interface{}, error) {
 	ref := id.db.NewRef("instruments")
-	var instruments instruments.InstrumentsMap
+	instruments := map[string]map[string]interface{}{}
 	if err := ref.Get(context.Background(), &instruments); err != nil {
 		return nil, err
 	}
-	return &instruments, nil
+	return instruments, nil
 }
 
 func (id *InstrumentData) GetInstrumentByID(instrumentID string) (*instruments.Instruments, error) {

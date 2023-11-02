@@ -28,7 +28,7 @@ func (rh *RoomHandler) AddRoom() echo.HandlerFunc {
 		var input rooms.Rooms
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler: bind input error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		res, err := rh.s.AddRoom(input, c.Get("user").(*jwt.Token))

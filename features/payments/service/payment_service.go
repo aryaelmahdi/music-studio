@@ -91,7 +91,7 @@ func (ps *PaymentService) SendEmail(recipientEmail string, orderID string, payme
 	subject := "Payment Details"
 	body := "Hello Users!! \n" +
 		"Thank You for reserving studio, \n" +
-		"your Order ID = " + orderID + "\n" +
+		"your Order ID : " + orderID + "\n" +
 		"Please complete your payment..."
 
 	message := "From: " + ps.c.From + "\n" +

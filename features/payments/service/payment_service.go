@@ -119,9 +119,9 @@ func (ps *PaymentService) ConfirmedPaymentEmail(orderID string) error {
 	}
 	to := make([]string, 1)
 	to[0] = email
-	subject := "Payment Complete"
+	subject := "Payment Completed"
 	body := "Hello Users!! \n \n" +
-		"Thank You for completeing th epayment, \n" +
+		"Thank You for completing the payment, \n" +
 		"your Order ID : " + orderID + "\n \n" +
 		"Enjoy Musicians!"
 

@@ -20,12 +20,20 @@ func NewInstrumentService(data instruments.InstrumentDataInterface, jwt helper.J
 	}
 }
 
-func (is *InstrumentService) GetAllInstruments() (*instruments.InstrumentsMap, error) {
+func (is *InstrumentService) GetAllInstruments(page int, pageSize int) ([]map[string]any, error) {
 	res, err := is.d.GetAllInstruments()
 	if err != nil {
 		return nil, errors.New("no data")
 	}
-	return res, nil
+	dataSlices := make([]map[string]any, 0)
+
+	for _, data := range res {
+		if _, exists := data["name"]; exists {
+			dataSlices = append(dataSlices, data)
+		}
+	}
+	paginatedRes, err := helper.Paginate(dataSlices, page, pageSize)
+	return paginatedRes, nil
 }
 
 func (is *InstrumentService) GetInstrumentByID(id string) (*instruments.Instruments, error) {

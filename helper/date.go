@@ -17,6 +17,10 @@ func CompareDate(date string) error {
 	month, _ := strconv.Atoi(dateParts[1])
 	year, _ := strconv.Atoi(dateParts[2])
 
+	if month > 12 || month < 0 {
+		return errors.New("invalid month")
+	}
+
 	reservationDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	today := time.Now()
 

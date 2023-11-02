@@ -49,6 +49,8 @@ func (rs *ReservationService) GetReservationsByUsername(token *jwt.Token) (map[s
 func (rs *ReservationService) AddReservation(newData reservations.Reservation, token *jwt.Token) (*reservations.Reservation, error) {
 	username, _ := rs.j.ExtractToken(token)
 	newData.Username = fmt.Sprint(username)
+	newData.ReservationID = newData.Date + newData.RoomID
+	newData.PaymentStatus = "not finished"
 	res, err := rs.d.AddReservation(newData)
 	if err != nil {
 		if strings.Contains(err.Error(), "room reserved") {

@@ -37,11 +37,10 @@ func main() {
 		e.Logger.Fatal("db nil")
 	}
 
-	generator := helper.NewGenerator()
 	jwt := helper.NewJWT(cfg.SECRET)
 
 	userData := ud.NewUserData(client)
-	userServices := us.NewUserService(userData, generator, jwt)
+	userServices := us.NewUserService(userData, jwt)
 	userHandler := uh.NewUserHandler(userServices)
 
 	roomData := rd.NewRoomData(client, openAIClient)

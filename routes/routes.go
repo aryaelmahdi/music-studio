@@ -14,6 +14,7 @@ import (
 func UserRoutes(e *echo.Echo, uh users.UserHandlerInterface) {
 	e.POST("/register", uh.Register())
 	e.POST("/login", uh.Login())
+	e.POST("/register/admin", uh.AdminRegister())
 }
 
 func RoomRoutes(e *echo.Echo, rh rooms.RoomHandler, secret string) {

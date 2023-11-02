@@ -19,6 +19,7 @@ type UserCredential struct {
 type UserHandlerInterface interface {
 	Register() echo.HandlerFunc
 	Login() echo.HandlerFunc
+	AdminRegister() echo.HandlerFunc
 }
 type UserServiceInterface interface {
 	Register(newData User) error

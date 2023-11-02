@@ -9,24 +9,32 @@ import (
 )
 
 type Payment struct {
+	OrderID       string `json:"order_id"`
 	ReservationID string `json:"reservation_id"`
-	Name          string `json:"name"`
+	Username      string `json:"username"`
 	GrossAmount   int    `json:"gross_amount"`
 }
 
 type PaymentData interface {
-	CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, string, error)
+	CreatePayment(request *snap.Request) (*snap.Response, error)
 	GetReservationInfo(reservationID string) (*reservations.Reservation, error)
 	GetUserEmail(username string) (string, error)
 	SendMessage(message *messaging.Message) error
 	SendEmail(smtpUser string, smtpPassword string, smtpServer string, smtpPort string, receiver []string, msg string) error
+	ConfirmedPayment(paymentInfo *Payment) error
+	IsReservationValid(reservationID string) (bool, string)
+	GetGrossAmount(roomID string) int
+	UpdateStatus(status map[string]any, reservationID string) error
 }
 type PaymentService interface {
-	CreatePayment(reservationID string) (*snap.Response, string, error)
+	CreatePayment(reservationID string) (*snap.Response, string, string, error)
 	SendMessage(token string, paymentToken string, orderID string) error
 	SendEmail(recipientEmail string, orderID string, paymentToken string) error
+	ConfirmedPayment(orderID string) error
+	ConfirmedPaymentEmail(orderID string) error
 }
 
 type PaymentHandler interface {
 	CreatePayment() echo.HandlerFunc
+	GetNotification() echo.HandlerFunc
 }

@@ -110,14 +110,14 @@ func (rh *RoomHandler) UpdateRoom() echo.HandlerFunc {
 		roomID := c.Param("id")
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler: bind input error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail"+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		input.RoomID = roomID
 		res, err := rh.s.UpdateRoom(roomID, input, c.Get("user").(*jwt.Token))
 		if err != nil {
 			c.Logger().Error("handler: update process error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail"+err.Error(), nil, http.StatusBadRequest))
 		}
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", res, http.StatusOK))
 	}

@@ -21,7 +21,7 @@ func NewUserHandler(service users.UserServiceInterface) users.UserHandlerInterfa
 
 func (uh *UserHandler) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input = new(RegisterInput)
+		input := users.User{}
 
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler: bind input error:", err.Error())
@@ -33,6 +33,11 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		user.Username = input.Username
 		user.Password = input.Password
 		user.Role = "user"
+
+		if ok := strings.Contains(user.Email, "@"); !ok || len(user.Email) < 15 {
+			c.Logger().Error("hanlder : invalid email format")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, invalid email format", nil, http.StatusBadRequest))
+		}
 
 		err := uh.s.Register(*user)
 

@@ -2,9 +2,12 @@ package data
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/smtp"
+	"project/features/payments"
 	"project/features/reservations"
+	"project/features/rooms"
 	"project/features/users"
 
 	"firebase.google.com/go/db"
@@ -67,6 +70,39 @@ func (pd *PaymentData) SendMessage(message *messaging.Message) error {
 	_, err := pd.fcm.Send(context.Background(), message)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (pd *PaymentData) ConfirmedPayment(paymentInfo *payments.Payment) error {
+	ref := pd.db.NewRef("payments").Child(paymentInfo.OrderID)
+	if err := ref.Set(context.Background(), &paymentInfo); err != nil {
+		return errors.New("something went wrong")
+	}
+	return nil
+}
+
+func (pd *PaymentData) IsReservationValid(reservationID string) (bool, string) {
+	ref := pd.db.NewRef("reservations").Child(reservationID)
+	var reservation reservations.Reservation
+	ref.Get(context.Background(), &reservation)
+	if reservation.Username == "" {
+		return false, ""
+	}
+	return true, reservation.Username
+}
+
+func (pd *PaymentData) GetGrossAmount(roomID string) int {
+	ref := pd.db.NewRef("rooms").Child(roomID)
+	var room rooms.Rooms
+	ref.Get(context.Background(), &room)
+	return room.Price
+}
+
+func (pd *PaymentData) UpdateStatus(status map[string]any, reservationID string) error {
+	ref := pd.db.NewRef("reservations").Child(reservationID)
+	if err := ref.Update(context.Background(), status); err != nil {
+		return errors.New("cannot update payment status")
 	}
 	return nil
 }

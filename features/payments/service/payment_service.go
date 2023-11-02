@@ -48,6 +48,35 @@ func (ps *PaymentService) CreatePayment(reservationID string) (*snap.Response, s
 	return res, snapRequest.TransactionDetails.OrderID, email, nil
 }
 
+func (ps *PaymentService) ConfirmedPayment(orderID string) error {
+	reservationID := orderID[3:]
+	reservationValid, username := ps.d.IsReservationValid(reservationID)
+	if !reservationValid || username == "" {
+		return errors.New("Reservation not found")
+	}
+	roomID := orderID[12:]
+	grossAmount := ps.d.GetGrossAmount(roomID)
+
+	var paymentInfo payments.Payment
+	paymentInfo.GrossAmount = grossAmount
+	paymentInfo.OrderID = orderID
+	paymentInfo.ReservationID = reservationID
+	paymentInfo.Username = username
+
+	if err := ps.d.ConfirmedPayment(&paymentInfo); err != nil {
+		return err
+	}
+
+	status := make(map[string]any)
+	status["payment_status"] = "finished"
+
+	if err := ps.d.UpdateStatus(status, reservationID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ps *PaymentService) SendMessage(token string, paymentToken string, orderID string) error {
 	message := generateMessage(token, paymentToken, paymentToken)
 	if err := ps.d.SendMessage(message); err != nil {

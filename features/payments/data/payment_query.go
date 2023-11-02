@@ -9,7 +9,6 @@ import (
 
 	"firebase.google.com/go/db"
 	"firebase.google.com/go/messaging"
-	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 )
 
@@ -45,32 +44,14 @@ func (pd *PaymentData) GetUserEmail(username string) (string, error) {
 	return user.Email, nil
 }
 
-func (pd *PaymentData) CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, string, error) {
-	orderID := "GSM" + reservationID
-	chargeReq := generateSnapReq(orderID, username, email, price)
-	fmt.Println("price : ", price)
+func (pd *PaymentData) CreatePayment(chargeReq *snap.Request) (*snap.Response, error) {
 	res, err := pd.client.CreateTransaction(chargeReq)
 	if err != nil {
 		fmt.Println("Error:", err.GetMessage())
-		return nil, "", err
+		return nil, err
 	}
 	fmt.Println("Snap response:", res)
-	return res, orderID, nil
-}
-
-func generateSnapReq(orderID string, username string, email string, price int) *snap.Request {
-	snapReq := &snap.Request{
-		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  orderID,
-			GrossAmt: int64(price),
-		},
-		CustomerDetail: &midtrans.CustomerDetails{
-			FName: username,
-			Email: email,
-		},
-		EnabledPayments: snap.AllSnapPaymentType,
-	}
-	return snapReq
+	return res, nil
 }
 
 func (pd *PaymentData) SendEmail(smtpUser string, smtpPassword string, smtpServer string, smtpPort string, receiver []string, msg string) error {

@@ -8,6 +8,7 @@ import (
 	"project/helper"
 
 	"firebase.google.com/go/messaging"
+	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 )
 
@@ -25,26 +26,26 @@ func NewPaymentService(data payments.PaymentData, jwt helper.JWTInterface, cfg c
 	}
 }
 
-func (ps *PaymentService) CreatePayment(reservationID string) (*snap.Response, string, error) {
+func (ps *PaymentService) CreatePayment(reservationID string) (*snap.Response, string, string, error) {
 	reservation, err := ps.d.GetReservationInfo(reservationID)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 
 	if reservation.Username == "" {
-		return nil, "", errors.New("No data")
+		return nil, "", "", errors.New("No data")
 	}
 
 	email, err := ps.d.GetUserEmail(reservation.Username)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
-
-	res, orderID, err := ps.d.CreatePayment(reservationID, reservation.Username, email, int(reservation.Price.(float64)))
+	snapRequest := generateSnapReq(reservationID, reservation.Username, email, int(reservation.Price.(float64)))
+	res, err := ps.d.CreatePayment(snapRequest)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
-	return res, orderID, nil
+	return res, snapRequest.TransactionDetails.OrderID, email, nil
 }
 
 func (ps *PaymentService) SendMessage(token string, paymentToken string, orderID string) error {
@@ -92,4 +93,19 @@ func generateMessage(token string, paymentToken string, orderID string) *messagi
 		Token:        token,
 	}
 	return message
+}
+
+func generateSnapReq(reservationID string, username string, email string, price int) *snap.Request {
+	snapReq := &snap.Request{
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  "GSM" + reservationID,
+			GrossAmt: int64(price),
+		},
+		CustomerDetail: &midtrans.CustomerDetails{
+			FName: username,
+			Email: email,
+		},
+		EnabledPayments: snap.AllSnapPaymentType,
+	}
+	return snapReq
 }

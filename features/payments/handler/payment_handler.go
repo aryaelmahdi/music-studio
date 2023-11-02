@@ -21,14 +21,13 @@ func NewPaymentHandler(service payments.PaymentService) *PaymentHandler {
 func (ph *PaymentHandler) CreatePayment() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		res, orderID, err := ph.s.CreatePayment(id)
-		registrationToken := c.Request().Header.Get("Authorization")
+		res, orderID, email, err := ph.s.CreatePayment(id)
 		if err != nil {
 			c.Logger().Error("Handler : cannot create payment", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
 		}
 		if res != nil && res.Token != "" {
-			errSendMessage := ph.s.SendEmail(registrationToken, orderID, res.Token)
+			errSendMessage := ph.s.SendEmail(email, orderID, res.Token)
 			if errSendMessage != nil {
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("failed, "+errSendMessage.Error(), nil, http.StatusBadRequest))
 			}

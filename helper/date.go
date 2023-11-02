@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+type HelperDate interface {
+	CompareDate(date string) error
+	VerifyCancelDate(date string) error
+}
+
 func CompareDate(date string) error {
 	dateParts := strings.Split(date, "-")
 	if len(dateParts) != 3 {

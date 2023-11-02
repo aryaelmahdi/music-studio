@@ -2,14 +2,16 @@ package data
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/smtp"
+	"project/features/payments"
 	"project/features/reservations"
+	"project/features/rooms"
 	"project/features/users"
 
 	"firebase.google.com/go/db"
 	"firebase.google.com/go/messaging"
-	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 )
 
@@ -45,32 +47,14 @@ func (pd *PaymentData) GetUserEmail(username string) (string, error) {
 	return user.Email, nil
 }
 
-func (pd *PaymentData) CreatePayment(reservationID string, username string, email string, price int) (*snap.Response, string, error) {
-	orderID := "GSM" + reservationID
-	chargeReq := generateSnapReq(orderID, username, email, price)
-	fmt.Println("price : ", price)
+func (pd *PaymentData) CreatePayment(chargeReq *snap.Request) (*snap.Response, error) {
 	res, err := pd.client.CreateTransaction(chargeReq)
 	if err != nil {
 		fmt.Println("Error:", err.GetMessage())
-		return nil, "", err
+		return nil, err
 	}
 	fmt.Println("Snap response:", res)
-	return res, orderID, nil
-}
-
-func generateSnapReq(orderID string, username string, email string, price int) *snap.Request {
-	snapReq := &snap.Request{
-		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  orderID,
-			GrossAmt: int64(price),
-		},
-		CustomerDetail: &midtrans.CustomerDetails{
-			FName: username,
-			Email: email,
-		},
-		EnabledPayments: snap.AllSnapPaymentType,
-	}
-	return snapReq
+	return res, nil
 }
 
 func (pd *PaymentData) SendEmail(smtpUser string, smtpPassword string, smtpServer string, smtpPort string, receiver []string, msg string) error {
@@ -86,6 +70,39 @@ func (pd *PaymentData) SendMessage(message *messaging.Message) error {
 	_, err := pd.fcm.Send(context.Background(), message)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (pd *PaymentData) ConfirmedPayment(paymentInfo *payments.Payment) error {
+	ref := pd.db.NewRef("payments").Child(paymentInfo.OrderID)
+	if err := ref.Set(context.Background(), &paymentInfo); err != nil {
+		return errors.New("something went wrong")
+	}
+	return nil
+}
+
+func (pd *PaymentData) IsReservationValid(reservationID string) (bool, string) {
+	ref := pd.db.NewRef("reservations").Child(reservationID)
+	var reservation reservations.Reservation
+	ref.Get(context.Background(), &reservation)
+	if reservation.Username == "" {
+		return false, ""
+	}
+	return true, reservation.Username
+}
+
+func (pd *PaymentData) GetGrossAmount(roomID string) int {
+	ref := pd.db.NewRef("rooms").Child(roomID)
+	var room rooms.Rooms
+	ref.Get(context.Background(), &room)
+	return room.Price
+}
+
+func (pd *PaymentData) UpdateStatus(status map[string]any, reservationID string) error {
+	ref := pd.db.NewRef("reservations").Child(reservationID)
+	if err := ref.Update(context.Background(), status); err != nil {
+		return errors.New("cannot update payment status")
 	}
 	return nil
 }

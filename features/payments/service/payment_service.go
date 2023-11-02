@@ -106,6 +106,37 @@ func (ps *PaymentService) SendEmail(recipientEmail string, orderID string, payme
 	return nil
 }
 
+func (ps *PaymentService) ConfirmedPaymentEmail(orderID string) error {
+	reservationID := orderID[3:]
+	reservationValid, username := ps.d.IsReservationValid(reservationID)
+	if !reservationValid || username == "" {
+		return errors.New("Reservation not found")
+	}
+
+	email, err := ps.d.GetUserEmail(username)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	to := make([]string, 1)
+	to[0] = email
+	subject := "Payment Complete"
+	body := "Hello Users!! \n \n" +
+		"Thank You for completeing th epayment, \n" +
+		"your Order ID : " + orderID + "\n \n" +
+		"Enjoy Musicians!"
+
+	message := "From: " + ps.c.From + "\n" +
+		"To: " + email + "\n" +
+		"Subject: " + subject + "\n\n" +
+		body
+	fmt.Println(ps.c.EmailUsername, ps.c.EmailPassword, ps.c.EmailHost, ps.c.EmailPort, to, message)
+	sendErr := ps.d.SendEmail(ps.c.EmailUsername, ps.c.EmailPassword, ps.c.EmailHost, ps.c.EmailPort, to, message)
+	if sendErr != nil {
+		return sendErr
+	}
+	return nil
+}
+
 func generateMessage(token string, paymentToken string, orderID string) *messaging.Message {
 	notification := &messaging.Notification{
 		Title: "Payment Notification ",

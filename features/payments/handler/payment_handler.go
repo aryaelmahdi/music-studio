@@ -58,6 +58,9 @@ func (ph *PaymentHandler) GetNotification() echo.HandlerFunc {
 		if err := ph.s.ConfirmedPayment(orderID); err != nil {
 			c.Logger().Error("handler : cannot confirmed payment")
 		}
+		if err := ph.s.ConfirmedPaymentEmail(orderID); err != nil {
+			c.Logger().Error("handler : cannot send email")
+		}
 		return c.String(http.StatusOK, "OK")
 	}
 }

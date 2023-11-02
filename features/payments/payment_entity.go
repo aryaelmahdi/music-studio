@@ -31,6 +31,7 @@ type PaymentService interface {
 	SendMessage(token string, paymentToken string, orderID string) error
 	SendEmail(recipientEmail string, orderID string, paymentToken string) error
 	ConfirmedPayment(orderID string) error
+	ConfirmedPaymentEmail(orderID string) error
 }
 
 type PaymentHandler interface {

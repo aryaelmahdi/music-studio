@@ -26,7 +26,7 @@ func (ph *PaymentHandler) CreatePayment() echo.HandlerFunc {
 		res, orderID, email, err := ph.s.CreatePayment(id)
 		if err != nil {
 			c.Logger().Error("Handler : cannot create payment", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, payment id already exists", nil, http.StatusBadRequest))
 		}
 		if res != nil && res.Token != "" {
 			errSendMessage := ph.s.SendEmail(email, orderID, res.Token)

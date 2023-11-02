@@ -50,8 +50,9 @@ func (ud *UserData) Login(username string, password string) (*users.User, error)
 func (ud *UserData) isExists(username string) bool {
 	ref := ud.db.NewRef("users").Child(username)
 	var user users.User
-	if err := ref.Get(context.Background(), &user); err == nil {
-		return true
+	ref.Get(context.Background(), &user)
+	if user.Email == "" {
+		return false
 	}
-	return false
+	return true
 }

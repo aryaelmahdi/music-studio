@@ -10,23 +10,20 @@ import (
 
 type UserService struct {
 	d users.UserDataInterface
-	g helper.GeneratorInterface
 	j helper.JWTInterface
 }
 
-func NewUserService(data users.UserDataInterface, generator helper.GeneratorInterface, jwt helper.JWTInterface) users.UserServiceInterface {
+func NewUserService(data users.UserDataInterface, jwt helper.JWTInterface) users.UserServiceInterface {
 	return &UserService{
 		d: data,
-		g: generator,
 		j: jwt,
 	}
 }
 
 func (us *UserService) Register(newData users.User) error {
 	err := us.d.Insert(newData)
-	fmt.Println("error", err)
 	if err != nil {
-		return errors.New("insert process failed")
+		return err
 	}
 
 	return nil

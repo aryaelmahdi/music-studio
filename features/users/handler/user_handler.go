@@ -25,14 +25,14 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Error("handler: bind input error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		var user = new(users.User)
 		user.Email = input.Email
 		user.Username = input.Username
 		user.Password = input.Password
-		user.Role = "user"
+		user.Role = "admin"
 
 		if ok := strings.Contains(user.Email, "@"); !ok || len(user.Email) < 15 {
 			c.Logger().Error("hanlder : invalid email format")
@@ -46,7 +46,7 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("handler: input process error:", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail", nil, http.StatusBadRequest))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("fail, "+err.Error(), nil, http.StatusBadRequest))
 		}
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res, http.StatusCreated))
